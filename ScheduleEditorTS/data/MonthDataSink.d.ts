@@ -14,7 +14,6 @@ export declare class MonthHeader implements DataTable.DataTable {
     private mRows;
     private mDate_Start;
     private mDate_End;
-    private mMonthHeader;
     constructor(month: number, year: number, showMonthHeaders?: boolean);
     maxCountRows(): number;
     maxCountCols(): number;

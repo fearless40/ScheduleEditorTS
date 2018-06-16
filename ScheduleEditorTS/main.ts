@@ -8,7 +8,7 @@ function main() : void {
     let tLayout = new Lt.LayoutTable(true);
     let hLayout = new Lt.Horizontal(true, true);
     hLayout.addDataTable(new MonthLabel());
-    hLayout.addDataTable(new MonthHeader(0, 2017, false));
+    hLayout.addDataTable(new MonthHeader(5, 2018, false));
     tLayout.addLayout(hLayout);
     tLayout.addLayout(hLayout);
 

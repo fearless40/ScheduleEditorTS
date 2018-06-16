@@ -69,32 +69,19 @@ export class MonthHeader implements DataTable.DataTable  {
     private mRows: Array<Array<String>>;
     private mDate_Start: Date;
     private mDate_End: Date;
-    private mMonthHeader: boolean
 
     constructor(month: number, year: number, showMonthHeaders: boolean = false) {
         this.mDate_Start = new Date(year, month, 1);
         this.mDate_End = new Date(year, month + 1, 0);
-        this.mMonthHeader = showMonthHeaders;
-
-        let row = []
-        for (let i = 1; i < 32; ++i) {
-            row[i - 1] = i.toString();
-        }
-
     }
 
 
     maxCountRows(): number {
-        if (this.mMonthHeader) {
-            return 3;
-        }
-        else {
-            return 2;
-        }
+         return 2;
     }
 
     maxCountCols(): number {
-        return 31; //todo fix this
+        return (this.mDate_End.getDate() - this.mDate_Start.getDate()) + 1; 
     }
 
     private extractRowFromID(id: number) : number {
@@ -124,9 +111,22 @@ export class MonthHeader implements DataTable.DataTable  {
 
         let ret = [];
         ret.length = this.maxCountCols();
-        for (let i = 0; i < this.maxCountCols(); ++i) {
-            ret[i] = new MonthHeaderDataItem(i, rowIndex * this.maxCountCols() + i)
+
+        switch (rowIndex) {
+            case 0:
+                for (let i = 0; i < this.maxCountCols(); ++i) {
+                    ret[i] = new MonthHeaderDataItem(i+1, rowIndex * this.maxCountCols() + i)
+                }
+                break;
+            case 1:
+                for (let i = 0; i < this.maxCountCols(); ++i) {
+                    let dt = new Date(this.mDate_Start);
+                    dt.setDate(i+1);
+                    ret[i] = new MonthHeaderDataItem(dt.toLocaleDateString("en", { weekday: "narrow" }), rowIndex * this.maxCountCols() + i)
+                }
+                break;
         }
+   
         return ret;
     }
 }
