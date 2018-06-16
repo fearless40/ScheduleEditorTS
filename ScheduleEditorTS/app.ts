@@ -1,4 +1,4 @@
-﻿class Greeter {
+﻿/*class Greeter {
     element: HTMLElement;
     span: HTMLElement;
     timerToken: number;
@@ -26,3 +26,4 @@ window.onload = () => {
     var greeter = new Greeter(el);
     greeter.start();
 };
+*/
