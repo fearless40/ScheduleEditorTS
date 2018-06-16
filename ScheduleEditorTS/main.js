@@ -8,6 +8,7 @@ function main() {
     hLayout.addDataTable(new MonthLabel());
     hLayout.addDataTable(new MonthHeader(0, 2017, false));
     tLayout.addLayout(hLayout);
+    tLayout.addLayout(hLayout);
     let render = new TableRender(el, tLayout);
     render.render();
 }

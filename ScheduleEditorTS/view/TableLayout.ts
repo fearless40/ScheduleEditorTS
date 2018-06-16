@@ -16,6 +16,7 @@ export const enum LayoutPosition {
 export class Wrapper implements LayoutItem {
     toGrid(): Cell2d {
         let ret = new Array<Array<Cell>>();
+        ret.length = this.mDataTable.maxCountRows();
         for (let i = 0; i < this.mDataTable.maxCountRows(); ++i) {
             let row = this.mDataTable.getRow(i);
             ret[i] = row.map<Cell>(function (value: DV.DataItem) : Cell {
@@ -64,7 +65,7 @@ export class Horizontal implements LayoutItem{
 
     adjustRowspan(adjust: Cell2d, comparelength: number): void {
         let rowIndex = adjust.length - 1;
-        let rowSpan = comparelength - adjust.length;
+        let rowSpan = (comparelength - adjust.length) + 1; // +1 as rowspan of 1 is normal, therefore need to increase by 1
         for (let colIndex = 0; colIndex < adjust[rowIndex].length; ++colIndex) {
             adjust[rowIndex][colIndex].rowspan = rowSpan;
         }
@@ -93,9 +94,9 @@ export class Horizontal implements LayoutItem{
                 this.adjustRowspan(last, nextGroup.length);
             }
             this.addEmptyRows(last, nextGroup.length) //Always need to pad the rows with empty cells to allow the following to work. 
-            last.forEach(function (value: Cell[], index: number): void {
-                last[index].concat(nextGroup[index]);
-            });
+            for (let r = 0; r < last.length; ++r) {
+                last[r] = last[r].concat(nextGroup[r]);
+            }
         }
         return last;
     }

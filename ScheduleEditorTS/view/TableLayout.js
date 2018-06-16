@@ -5,6 +5,7 @@ export class Wrapper {
     }
     toGrid() {
         let ret = new Array();
+        ret.length = this.mDataTable.maxCountRows();
         for (let i = 0; i < this.mDataTable.maxCountRows(); ++i) {
             let row = this.mDataTable.getRow(i);
             ret[i] = row.map(function (value) {
@@ -49,7 +50,7 @@ export class Horizontal {
     }
     adjustRowspan(adjust, comparelength) {
         let rowIndex = adjust.length - 1;
-        let rowSpan = comparelength - adjust.length;
+        let rowSpan = (comparelength - adjust.length) + 1; // +1 as rowspan of 1 is normal, therefore need to increase by 1
         for (let colIndex = 0; colIndex < adjust[rowIndex].length; ++colIndex) {
             adjust[rowIndex][colIndex].rowspan = rowSpan;
         }
@@ -75,9 +76,9 @@ export class Horizontal {
                 this.adjustRowspan(last, nextGroup.length);
             }
             this.addEmptyRows(last, nextGroup.length); //Always need to pad the rows with empty cells to allow the following to work. 
-            last.forEach(function (value, index) {
-                last[index].concat(nextGroup[index]);
-            });
+            for (let r = 0; r < last.length; ++r) {
+                last[r] = last[r].concat(nextGroup[r]);
+            }
         }
         return last;
     }
