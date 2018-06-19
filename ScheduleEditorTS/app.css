@@ -2,6 +2,32 @@
     font-family: 'Segoe UI', sans-serif;
 }
 
-span {
-    font-style: italic;
+table {
+    border-collapse:collapse;
+    table-layout:fixed;
+    width:100%;
+    border: 1px solid black;
+}
+
+table td {
+    border: 1px solid grey;
+    text-align: center;
+    width: 2em;
+    height: 2em;
+    padding: 0px 0px 0px 0px;
+    margin: 0px 0px 0px 0px;
+}
+
+table tr {
+    border: 1px solid grey;
+}
+
+table td:nth-child(1) {
+    font-style:italic;
+    width:8em;
+}
+
+table tr:last-child {
+    width: 3em;
+    background-color:aquamarine;
 }

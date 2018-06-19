@@ -23,6 +23,7 @@ export class Cell {
     public rowspan: number
     public colspan: number
     public data: DataItem
+    public isHeader: boolean
 
     constructor(data: DataItem, rowspan: number = 1, colspan: number = 1) {
         this.rowspan = rowspan;
@@ -38,4 +39,22 @@ export class Cell {
 
 }
 
+export class RowAttrib {
+    isHeader: boolean;
+    isFooter: boolean;
+    isBody: boolean;
+    cssClass: string;
+    cssStyle: string;
+}
+
+export class Grid {
+    private mRowAttributes: RowAttrib[];
+    private mRows: Array<Array<Cell>>;
+
+    addRow(rowAttrib: RowAttrib, data: Array<Cell>): void {
+
+    }
+
+    
+}
 
