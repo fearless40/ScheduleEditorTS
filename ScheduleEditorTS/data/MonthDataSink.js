@@ -1,15 +1,4 @@
-class MonthLabelDataItem {
-    constructor(value, mId) {
-        this.value = value;
-        this.mId = mId;
-    }
-    get isReadOnly() {
-        return true;
-    }
-    get id() {
-        return this.mId;
-    }
-}
+import { ReadonlyDataItem } from "./DataItemHelpers.js";
 export class MonthLabel {
     constructor() {
     }
@@ -22,33 +11,17 @@ export class MonthLabel {
     getRow(rowIndex) {
         return [this.getById(0), this.getById(1)];
     }
-    getByRowCol(row, col) {
-        return;
-    }
     getById(dataID) {
         switch (dataID) {
             case 0:
-                return new MonthLabelDataItem("MonthLabel", 0);
+                return new ReadonlyDataItem("MonthLabel");
             case 1:
-                return new MonthLabelDataItem("GRID", 1);
+                return new ReadonlyDataItem("GRID");
         }
-    }
-    getOnChange() {
-        return function (id, valueNew, valueOld) { return true; };
-    }
-    setOnChange(cb) {
-        return { token: 0 };
-    }
-}
-class MonthHeaderDataItem {
-    constructor(val, _id) {
-        this.isReadOnly = true;
-        this.id = _id;
-        this.value = val;
     }
 }
 export class MonthHeader {
-    constructor(month, year, showMonthHeaders = false) {
+    constructor(month, year) {
         this.mDate_Start = new Date(year, month, 1);
         this.mDate_End = new Date(year, month + 1, 0);
     }
@@ -62,16 +35,7 @@ export class MonthHeader {
         return id - (this.maxCountCols() * Math.floor(id / this.maxCountCols()));
     }
     getById(dataID) {
-        return new MonthHeaderDataItem(dataID, 0);
-    }
-    getOnChange() {
-        return (function (id, valueNew, valueOld) { return true; });
-    }
-    setOnChange(cb) {
-        return { token: 0 };
-    }
-    getByRowCol(row, col) {
-        return new MonthHeaderDataItem(col, 0);
+        return new ReadonlyDataItem(dataID.toString());
     }
     getRow(rowIndex) {
         if (rowIndex > this.maxCountRows()) {
@@ -82,14 +46,14 @@ export class MonthHeader {
         switch (rowIndex) {
             case 0:
                 for (let i = 0; i < this.maxCountCols(); ++i) {
-                    ret[i] = new MonthHeaderDataItem(i + 1, rowIndex * this.maxCountCols() + i);
+                    ret[i] = new ReadonlyDataItem((i + 1).toString());
                 }
                 break;
             case 1:
                 for (let i = 0; i < this.maxCountCols(); ++i) {
                     let dt = new Date(this.mDate_Start);
                     dt.setDate(i + 1);
-                    ret[i] = new MonthHeaderDataItem(dt.toLocaleDateString("en", { weekday: "narrow" }), rowIndex * this.maxCountCols() + i);
+                    ret[i] = new ReadonlyDataItem(dt.toLocaleDateString("en", { weekday: "narrow" }));
                 }
                 break;
         }

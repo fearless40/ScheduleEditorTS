@@ -31,3 +31,28 @@ table tr:last-child {
     width: 3em;
     background-color:aquamarine;
 }
+
+.cell-right-border-divison {
+    border-right-width:thick;
+}
+
+.cell-left-border-divison {
+    border-left-width: thick;
+}
+
+.cell-bottom-border-divison {
+    border-bottom-width: thick;
+}
+
+.cell-top-border-divison {
+    border-top-width: thick;
+}
+
+
+table tr .row-bottom-border-division {
+    border-bottom-width: medium;
+}
+
+table tr .row-top-border-division {
+    border-top-width: medium;
+}

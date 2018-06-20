@@ -1,5 +1,5 @@
-import * as DV from "../view/DataTable.js";
-import { Cell, Cell2d } from "./Grid.js";
+import * as DV from "../data/Data.js";
+import { Cell, Cell2d } from "./Cell.js";
 export interface LayoutItem {
     toGrid(): Cell2d;
 }
@@ -23,6 +23,7 @@ export declare class Horizontal implements LayoutItem {
     toGrid(): Cell2d;
     private mLayouts;
     constructor(isHeader?: boolean, autoExpand?: boolean);
+    borderBetweenDivisions: boolean;
 }
 export declare class Vertical implements LayoutItem {
     isHeader: boolean;
@@ -32,6 +33,7 @@ export declare class Vertical implements LayoutItem {
     addEmptyCols(adjust: Cell[], nbrToAdd: number): void;
     toGrid(): Cell2d;
     private mLayouts;
+    borderBetweenDivisions: boolean;
     constructor(isHeader?: boolean, autoExpand?: boolean);
 }
 export declare class LayoutTable extends Vertical {

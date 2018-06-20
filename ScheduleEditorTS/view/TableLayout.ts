@@ -1,5 +1,5 @@
-﻿import * as DV from "../view/DataTable.js"
-import { Cell, Cell2d, MaxColumns  } from "./Grid.js"
+﻿import * as DV from "../data/Data.js"
+import { Cell, Cell2d, MaxColumns  } from "./Cell.js"
 
 
 export interface LayoutItem {
@@ -95,6 +95,10 @@ export class Horizontal implements LayoutItem{
             }
             this.addEmptyRows(last, nextGroup.length) //Always need to pad the rows with empty cells to allow the following to work. 
             for (let r = 0; r < last.length; ++r) {
+                if (this.borderBetweenDivisions) {
+                    last[r][last[r].length - 1].cssClasses.push("cell-right-border-divison");
+                    nextGroup[r][0].cssClasses.push("cell-left-border-divison");
+                }
                 last[r] = last[r].concat(nextGroup[r]);
             }
         }
@@ -108,6 +112,8 @@ export class Horizontal implements LayoutItem{
     constructor(public isHeader: boolean = false, public autoExpand: boolean = true) {
 
     }
+
+    public borderBetweenDivisions: boolean = false;
 
 }
 
@@ -143,7 +149,12 @@ export class Vertical implements LayoutItem{
             }
 
             // Now Add all the rows from nextGroup to last
-            nextGroup.forEach(function (value: Cell[]) {
+            let that = this;
+            nextGroup.forEach(function (value: Cell[], index : number) {
+                if (index == 0 && that.borderBetweenDivisions) {
+                    last[last.length - 1].forEach((value: Cell) => { value.cssClasses.push("cell-bottom-border-divison") });
+                    value.forEach((value: Cell) => { value.cssClasses.push("cell-top-border-divison")})
+                }
                 last.push(value);
             })
         }
@@ -151,6 +162,7 @@ export class Vertical implements LayoutItem{
     }
 
     private mLayouts: LayoutItem[] = [];
+    public borderBetweenDivisions: boolean = false;
 
     //public isHeaderLike = false; //Set to true tends to make the item always visible
     //public autoExpand = true; //Set to true to change the colspan rather than generate empty cells

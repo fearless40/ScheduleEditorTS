@@ -1,4 +1,4 @@
-import { DataItem } from "./DataTable.js";
+import { DataItem } from "../data/Data.js";
 export declare type Cell2d = Array<Array<Cell>>;
 export declare function MaxColumns(items: Cell2d): number;
 export declare const enum CellType {

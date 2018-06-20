@@ -27,6 +27,9 @@ export class TableRender {
                         td.setAttribute("rowspan", cell.rowspan.toString());
                     if (cell.colspan > 1)
                         td.setAttribute("colspan", cell.colspan.toString());
+                    if (cell.cssClasses.length > 0) {
+                        cell.cssClasses.forEach((value) => { td.classList.add(value); });
+                    }
                     td.textContent = cell.data.value.toString();
                     tr.appendChild(td);
                 }

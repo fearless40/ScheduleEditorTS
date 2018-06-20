@@ -1,26 +1,19 @@
-import * as DataTable from "../view/DataTable.js";
-import { DataItem } from "../view/DataTable.js";
-export declare class MonthLabel implements DataTable.DataTable {
+import { DataTable, DataItem } from "./Data.js";
+export declare class MonthLabel implements DataTable {
     constructor();
     maxCountRows(): number;
     maxCountCols(): number;
-    getRow(rowIndex: number): Array<DataTable.DataItem>;
-    getByRowCol(row: number, col: number): DataTable.DataItem;
-    getById(dataID: number): DataTable.DataItem;
-    getOnChange(): DataTable.OnChange;
-    setOnChange(cb: DataTable.OnChange): DataTable.OnChangeToken;
+    getRow(rowIndex: number): Array<DataItem>;
+    getById(dataID: number): DataItem;
 }
-export declare class MonthHeader implements DataTable.DataTable {
+export declare class MonthHeader implements DataTable {
     private mRows;
     private mDate_Start;
     private mDate_End;
-    constructor(month: number, year: number, showMonthHeaders?: boolean);
+    constructor(month: number, year: number);
     maxCountRows(): number;
     maxCountCols(): number;
     private extractRowFromID(id);
-    getById(dataID: number): DataTable.DataItem;
-    getOnChange(): DataTable.OnChange;
-    setOnChange(cb: DataTable.OnChange): DataTable.OnChangeToken;
-    getByRowCol(row: number, col: number): DataItem;
-    getRow(rowIndex: number): Array<DataTable.DataItem>;
+    getById(dataID: number): DataItem;
+    getRow(rowIndex: number): Array<DataItem>;
 }

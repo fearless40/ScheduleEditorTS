@@ -18,12 +18,9 @@ export declare class EmptyDataItem implements DataItem {
 }
 export interface DataView {
     getById(dataID: number): DataItem;
-    getOnChange(): OnChange;
-    setOnChange(cb: OnChange): OnChangeToken;
 }
 export interface DataTable extends DataView {
     maxCountRows(): number;
     maxCountCols(): number;
     getRow(rowIndex: number): Array<DataItem>;
-    getByRowCol(row: number, col: number): DataItem;
 }

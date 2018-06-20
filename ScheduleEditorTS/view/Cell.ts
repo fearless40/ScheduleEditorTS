@@ -1,4 +1,5 @@
-﻿import { DataItem,EmptyDataItem } from "./DataTable.js"
+﻿import { DataItem } from "../data/Data.js"
+import { EmptyDataItem } from "../data/EmptyData.js"
 
 export type Cell2d = Array<Array<Cell>>
 
@@ -36,25 +37,9 @@ export class Cell {
     }
 
     public static readonly EmptyCell = new Cell(EmptyDataItem.EmptyItem, -1, -1);
-
+    public cssClasses: string[] = [];
 }
-
-export class RowAttrib {
-    isHeader: boolean;
-    isFooter: boolean;
-    isBody: boolean;
-    cssClass: string;
-    cssStyle: string;
-}
-
-export class Grid {
-    private mRowAttributes: RowAttrib[];
-    private mRows: Array<Array<Cell>>;
-
-    addRow(rowAttrib: RowAttrib, data: Array<Cell>): void {
-
-    }
 
     
-}
+
 

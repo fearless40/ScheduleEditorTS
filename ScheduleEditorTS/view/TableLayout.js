@@ -1,4 +1,4 @@
-import { Cell, MaxColumns } from "./Grid.js";
+import { Cell, MaxColumns } from "./Cell.js";
 export class Wrapper {
     constructor(mDataTable) {
         this.mDataTable = mDataTable;
@@ -41,6 +41,7 @@ export class Horizontal {
         this.isHeader = isHeader;
         this.autoExpand = autoExpand;
         this.mLayouts = [];
+        this.borderBetweenDivisions = false;
     }
     addDataTable(datatable, position = -1 /* Last */, specific_position) {
         return this.addLayout(new Wrapper(datatable), position, specific_position);
@@ -77,6 +78,10 @@ export class Horizontal {
             }
             this.addEmptyRows(last, nextGroup.length); //Always need to pad the rows with empty cells to allow the following to work. 
             for (let r = 0; r < last.length; ++r) {
+                if (this.borderBetweenDivisions) {
+                    last[r][last[r].length - 1].cssClasses.push("cell-right-border-divison");
+                    nextGroup[r][0].cssClasses.push("cell-left-border-divison");
+                }
                 last[r] = last[r].concat(nextGroup[r]);
             }
         }
@@ -90,6 +95,7 @@ export class Vertical {
         this.isHeader = isHeader;
         this.autoExpand = autoExpand;
         this.mLayouts = [];
+        this.borderBetweenDivisions = false;
     }
     addDataTable(datatable, position = -1 /* Last */, specific_position) {
         return this.addLayout(new Wrapper(datatable), position, specific_position);
@@ -117,7 +123,12 @@ export class Vertical {
                 }
             }
             // Now Add all the rows from nextGroup to last
-            nextGroup.forEach(function (value) {
+            let that = this;
+            nextGroup.forEach(function (value, index) {
+                if (index == 0 && that.borderBetweenDivisions) {
+                    last[last.length - 1].forEach((value) => { value.cssClasses.push("cell-bottom-border-divison"); });
+                    value.forEach((value) => { value.cssClasses.push("cell-top-border-divison"); });
+                }
                 last.push(value);
             });
         }

@@ -1,4 +1,4 @@
-import { EmptyDataItem } from "./DataTable.js";
+import { EmptyDataItem } from "../data/EmptyData.js";
 export function MaxColumns(items) {
     let maxCol = 0;
     for (let row of items) {
@@ -18,4 +18,4 @@ export class Cell {
     }
 }
 Cell.EmptyCell = new Cell(EmptyDataItem.EmptyItem, -1, -1);
-//# sourceMappingURL=Grid.js.map
+//# sourceMappingURL=Cell.js.map
