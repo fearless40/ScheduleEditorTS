@@ -16,7 +16,7 @@ export class GetSingleDataItem {
         return [this.getById(0)];
     }
 }
-export class GetSingleColumn {
+export class LimitColumns {
     constructor(datatabletowrap, colstart, colend) {
         this.mDT = datatabletowrap;
         this.mColStart = colstart;

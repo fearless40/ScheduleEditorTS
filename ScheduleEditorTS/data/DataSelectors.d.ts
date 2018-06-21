@@ -8,7 +8,7 @@ export declare class GetSingleDataItem implements DataTable {
     getById(id: number): DataItem;
     getRow(row: number): DataItem[];
 }
-export declare class GetSingleColumn implements DataTable {
+export declare class LimitColumns implements DataTable {
     private mDT;
     private mColStart;
     private mColEnd;

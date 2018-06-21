@@ -2,7 +2,7 @@
 import { MonthLabel, MonthHeader } from "./data/MonthDataSink.js";
 import { TableRender } from "./renders/TableRender.js";
 import { ScheduleSlotData, ScheduleSlotSpecialValues } from "./data/ScheduleData.js"
-import { GetSingleDataItem, GetSingleColumn} from "./data/DataSelectors.js"
+import { GetSingleDataItem, LimitColumns} from "./data/DataSelectors.js"
 
 
 function main() : void {
@@ -12,8 +12,8 @@ function main() : void {
 
     let sch = new ScheduleSlotData();
     let schName = new GetSingleDataItem(sch, ScheduleSlotSpecialValues.ScheduleOwnerName);
-    let slots = new GetSingleColumn(sch, 0);
-    let schView = new GetSingleColumn(sch, 2, sch.maxCountCols() - 1);
+    let slots = new LimitColumns(sch, 0);
+    let schView = new LimitColumns(sch, 2, sch.maxCountCols() - 1);
 
     let sHGroup = new Lt.Horizontal(true, true);
     sHGroup.addDataTable(schName);

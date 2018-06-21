@@ -93,6 +93,7 @@
     <TypeScriptCompile Include="data\DataSelectors.ts" />
     <TypeScriptCompile Include="data\EmptyData.ts" />
     <TypeScriptCompile Include="data\MonthDataSink.ts" />
+    <TypeScriptCompile Include="data\OnChangeEventImplementation.ts" />
     <TypeScriptCompile Include="data\ScheduleData.ts" />
     <TypeScriptCompile Include="main.ts" />
     <TypeScriptCompile Include="renders\TableRender.ts" />

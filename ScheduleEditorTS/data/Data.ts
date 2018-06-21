@@ -14,9 +14,9 @@ export interface OnChange {
     (ids: number[], values: DataValue[]): void
 }
 
-export interface OnChangeToken {
+/*export interface OnChangeToken {
     readonly token : any;
-}
+}*/
 
 export interface DataItem {
     readonly value: DataValue;
@@ -25,13 +25,13 @@ export interface DataItem {
 }
 
 export interface DataEvents {
-    onChange(ids: number[], values: DataValue[]): onChangeResults
-    listen(cb: OnChange): OnChangeToken
-    removeListener(token: OnChangeToken): void
+    addListener(cb: OnChange): void
+    removeListener(cb: OnChange): void
 }
 
 export interface DataView {
     getById(dataID: number): DataItem
+    modify?(ids: number[], values: DataValue[]): onChangeResults
     events?: DataEvents;
 }
 

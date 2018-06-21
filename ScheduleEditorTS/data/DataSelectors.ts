@@ -27,7 +27,7 @@ export class GetSingleDataItem implements DataTable {
     }
 }
 
-export class GetSingleColumn implements DataTable {
+export class LimitColumns implements DataTable {
     private mDT: DataTable
     private mColStart: number;
     private mColEnd: number;
