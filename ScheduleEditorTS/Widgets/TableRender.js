@@ -22,7 +22,8 @@ export class TableRender {
             for (let colIndex = 0; colIndex < row.length; ++colIndex) {
                 let cell = row[colIndex];
                 if (!cell.isEmpty()) {
-                    let td = document.createElement("td");
+                    let tdType = cell.isHeader ? "th" : "td";
+                    let td = document.createElement(tdType);
                     if (cell.rowspan > 1)
                         td.setAttribute("rowspan", cell.rowspan.toString());
                     if (cell.colspan > 1)

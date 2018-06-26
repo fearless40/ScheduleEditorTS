@@ -102,6 +102,13 @@ export class Horizontal implements LayoutItem{
                 last[r] = last[r].concat(nextGroup[r]);
             }
         }
+        
+        if( this.isHeader ) {
+            last.forEach( (value) => {
+                value.forEach( (cell) => cell.isHeader = true );
+            });
+        }
+
         return last;
     }
 
@@ -158,6 +165,13 @@ export class Vertical implements LayoutItem{
                 last.push(value);
             })
         }
+        
+         if( this.isHeader ) {
+                    last.forEach( (value) => {
+                        value.forEach( (cell) => cell.isHeader = true );
+                    });
+        }
+
         return last;
     }
 

@@ -1,6 +1,6 @@
 ﻿import * as Lt from "./view/TableLayout.js";
 import { MonthLabel, MonthHeader } from "./data/MonthDataSink.js";
-import { TableRender } from "./renders/TableRender.js";
+import { ScheduleWidget } from "./Widgets/ScheduleWidget.js";
 import { ScheduleSlotData, ScheduleSlotSpecialValues } from "./data/ScheduleData.js"
 import { GetSingleDataItem, LimitColumns} from "./data/DataSelectors.js"
 
@@ -30,7 +30,7 @@ function main() : void {
     
     hLayout.borderBetweenDivisions = true;
     tLayout.borderBetweenDivisions = true;
-    let render = new TableRender(el, tLayout);
+    let render = new ScheduleWidget(el, tLayout);
 
     render.render();
 

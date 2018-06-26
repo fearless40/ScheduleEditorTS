@@ -41,7 +41,7 @@
     <TypeScriptOutFile>
     </TypeScriptOutFile>
     <TypeScriptOutDir />
-    <TypeScriptGeneratesDeclarations>True</TypeScriptGeneratesDeclarations>
+    <TypeScriptGeneratesDeclarations>False</TypeScriptGeneratesDeclarations>
     <TypeScriptNoEmitOnError>True</TypeScriptNoEmitOnError>
     <TypeScriptSourceMap>True</TypeScriptSourceMap>
     <TypeScriptMapRoot />
@@ -96,7 +96,7 @@
     <TypeScriptCompile Include="data\OnChangeEventImplementation.ts" />
     <TypeScriptCompile Include="data\ScheduleData.ts" />
     <TypeScriptCompile Include="main.ts" />
-    <TypeScriptCompile Include="renders\TableRender.ts" />
+    <TypeScriptCompile Include="Widgets\ScheduleWidget.ts" />
     <TypeScriptCompile Include="data\Data.ts" />
     <TypeScriptCompile Include="view\Cell.ts" />
     <TypeScriptCompile Include="view\TableLayout.ts" />
