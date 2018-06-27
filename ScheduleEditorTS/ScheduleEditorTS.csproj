@@ -89,6 +89,7 @@
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="controllers\tableeditor.ts" />
     <TypeScriptCompile Include="data\DataItemHelpers.ts" />
     <TypeScriptCompile Include="data\DataSelectors.ts" />
     <TypeScriptCompile Include="data\EmptyData.ts" />
@@ -96,7 +97,7 @@
     <TypeScriptCompile Include="data\OnChangeEventImplementation.ts" />
     <TypeScriptCompile Include="data\ScheduleData.ts" />
     <TypeScriptCompile Include="main.ts" />
-    <TypeScriptCompile Include="Widgets\ScheduleWidget.ts" />
+    <TypeScriptCompile Include="widgets\ScheduleWidget.ts" />
     <TypeScriptCompile Include="data\Data.ts" />
     <TypeScriptCompile Include="view\Cell.ts" />
     <TypeScriptCompile Include="view\TableLayout.ts" />
