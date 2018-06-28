@@ -1,5 +1,6 @@
 ﻿import { LayoutTable } from "../view/TableLayout.js";
 import { DataItem, DataView } from "../data/Data.js";
+import { Datum } from "../data/DataItemHelpers.js";
 
 class ColItem {
     constructor() {}
@@ -21,6 +22,11 @@ export interface ScheduleWidgetID {
     row: number
     col: number
 };
+
+export interface ScheduleWidgetCellInfo {
+    id: ScheduleWidgetID
+    data: DataItem
+}
 
 class HtmlCell {
     constructor( element : HTMLElement, data : DataItem ) {
@@ -74,6 +80,16 @@ export class ScheduleWidget {
     getElementID(element : HTMLElement) : ScheduleWidgetID {
         return {row: parseInt(element.getAttribute(SWAttributes.RowIndex)),
                 col: parseInt(element.getAttribute(SWAttributes.ColIndex))};
+    }
+
+    getElementDetails(element: HTMLElement): ScheduleWidgetCellInfo {
+        let id = this.getElementID(element);
+        return {
+            id : id,
+            data: new Datum(element.textContent,
+                this.mHtmlCells[id.row][id.col].id,
+                this.mHtmlCells[id.row][id.col].owner)
+        }
     }
 
     change(elementIds: ScheduleWidgetID[], values : string[]) : void {

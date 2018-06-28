@@ -1,3 +1,4 @@
+import { Datum } from "../data/DataItemHelpers.js";
 class ColItem {
     constructor() {
         this.value = "";
@@ -40,6 +41,13 @@ export class ScheduleWidget {
     getElementID(element) {
         return { row: parseInt(element.getAttribute("data-row" /* RowIndex */)),
             col: parseInt(element.getAttribute("data-col" /* ColIndex */)) };
+    }
+    getElementDetails(element) {
+        let id = this.getElementID(element);
+        return {
+            id: id,
+            data: new Datum(element.textContent, this.mHtmlCells[id.row][id.col].id, this.mHtmlCells[id.row][id.col].owner)
+        };
     }
     change(elementIds, values) {
         // Fire onchange event before writing to the element
