@@ -1,11 +1,11 @@
 import { Datum } from "./DataItemHelpers.js";
-import { OnChangeEventImplementation } from "./OnChangeEventImplementation.js";
+import { EventSimple } from "../util/EventSimple.js";
 class RowCol {
 }
 export class ScheduleSlotData {
     constructor() {
         this.mOwner = "Spivack";
-        this.events = new OnChangeEventImplementation();
+        this.events = new EventSimple();
         this.generateData();
     }
     generateData() {

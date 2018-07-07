@@ -1,5 +1,12 @@
-﻿
+﻿import {EventSimple} from "../util/EventSimple.js"
+
 export type DataValue = string | number
+
+export const enum DataChangedBy {
+    User,
+    Software,
+    DB,
+}
 
 export interface onChangeResults {
     isOk: boolean
@@ -10,13 +17,12 @@ export interface onChangeResults {
     }
 }
 
-export interface OnChange {
-    (ids: number[], values: DataValue[]): void
+export interface EventOnChange {
+    owner: DataView;
+    ids: number[];
+    values: DataValue[];
+    who: DataChangedBy[];
 }
-
-/*export interface OnChangeToken {
-    readonly token : any;
-}*/
 
 export interface DataItem {
     readonly value: DataValue;
@@ -24,15 +30,10 @@ export interface DataItem {
     readonly owner: DataView;
 }
 
-export interface DataEvents {
-    addListener(cb: OnChange): void
-    removeListener(cb: OnChange): void
-}
-
 export interface DataView {
     getById(dataID: number): DataItem
     modify?(ids: number[], values: DataValue[]): onChangeResults
-    events?: DataEvents;
+    events?: EventSimple<EventOnChange>;
 }
 
 export interface DataTable extends DataView{

@@ -1,4 +1,30 @@
-﻿body {
+﻿
+.schedule-select {
+    background-color: lightblue;
+}
+
+.schedule-select-top {
+    border-top-color: black;
+    border-top-width: 2px;
+}
+
+.schedule-select-bottom {
+    border-bottom-color: black;
+    border-bottom-width: 2px;
+}
+
+.schedule-select-left {
+    border-left-color: black;
+    border-left-width: 2px;
+}
+
+.schedule-select-right {
+    border-right-color: black;
+    border-right-width: 2px;
+}
+
+
+body {
     font-family: 'Segoe UI', sans-serif;
     font-size:medium;
 }
@@ -33,7 +59,7 @@ table td,th {
     border-bottom-width: thick;
 }
 
-.cell-top-border-divison {
+ .cell-top-border-divison {
     border-top-width: thick;
 }
 

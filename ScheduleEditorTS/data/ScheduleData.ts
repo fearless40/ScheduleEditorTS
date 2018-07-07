@@ -1,6 +1,6 @@
-﻿import {DataTable, DataItem, DataEvents, DataValue, onChangeResults, OnChange} from "./Data.js"
+﻿import { DataTable, DataItem, DataValue, onChangeResults, DataChangedBy, EventOnChange} from "./Data.js"
 import { Datum } from "./DataItemHelpers.js"
-import {OnChangeEventImplementation} from "./OnChangeEventImplementation.js"
+import {EventSimple} from "../util/EventSimple.js"
 /*
  * ScheduleData event chain
  * If user modifies a value:
@@ -61,7 +61,7 @@ export class ScheduleSlotData implements DataTable{
 
 
     constructor() {
-        this.events = new OnChangeEventImplementation();
+        this.events = new EventSimple<EventOnChange>();
         this.generateData();
     }
 
@@ -114,6 +114,6 @@ export class ScheduleSlotData implements DataTable{
         return {isOk: true}
     }
 
-    readonly events: DataEvents
+    readonly events: EventSimple<EventOnChange>
     
 } 
