@@ -129,7 +129,7 @@ class Selection {
         //this.click(this.mRow_end + rowCount, this.mCol_end + colCount);
         this.mRow_end += rowCount;
         this.mCol_end += colCount;
-        //this.normalize();
+        this.normalize();
     }
 
     click(rowId: number, colId: number): void {
@@ -137,39 +137,12 @@ class Selection {
             this.set(rowId, colId);
             return;
         }
-
-        if (rowId <= this.mRow_start) {
-            //this.mRow_end = this.mRow_start
-            this.mRow_start = rowId;
-        }
-        else {
-            this.mRow_end = rowId;
-        }
-
-        if (colId <= this.mCol_start) {
-            //this.mCol_end = this.mCol_start
-            this.mCol_start = colId;
-        }
-        else {
-            this.mCol_end = colId;
-        }
-
+        this.mCol_end = colId;
+        this.mRow_end = rowId;
         this.normalize();
     }
-
     
-
     private normalize(): void {
-       /* if (this.mRow_end < this.mRow_start) {
-            // Swapping with destructuring
-            [this.mRow_start, this.mRow_end] = [this.mRow_end, this.mRow_start];
-        }
-
-        if (this.mCol_end < this.mCol_start) {
-            [this.mCol_start, this.mCol_end] = [this.mCol_end, this.mCol_start];
-        }
-        */
-
         if (this.mRow_start < this.row_min) { this.mRow_start = this.row_min };
         if (this.mRow_start > this.row_max) { this.mRow_start = this.row_max };
 
@@ -468,6 +441,6 @@ export class ScheduleWidget {
         grid = null;
 
         // Currently a quick hack should make it ignore the header cells
-        this.mCurrentSelection = new Selection(2,this.mHtmlCells.length,2,this.mHtmlCells[0].length)
+        this.mCurrentSelection = new Selection(2, this.mHtmlCells.length - 1, 2, this.mHtmlCells[0].length-1);
     }
 }

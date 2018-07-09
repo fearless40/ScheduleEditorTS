@@ -51,6 +51,7 @@ export class TableEditor {
 
     private onKeyDown = (e: KeyboardEvent): void => {
         if (e.shiftKey) {
+            if (e.defaultPrevented) return;
             this.onKeyDownSelection(e);
             return;
         }
@@ -60,28 +61,37 @@ export class TableEditor {
 
     }
 
-    private onDragStart = (e: Event): void => {
-        this.mSchedule.selection_click(this.mSchedule.getElementID(<HTMLElement>e.target), true)
-        this.mSelecting = true;
-        e.preventDefault();
-    }
-    private onDrag = (e: Event): void => {
-        if (this.mSelecting) {
-            this.mSchedule.selection_click(this.mSchedule.getElementID(<HTMLElement>e.target), false)
+    private onDragStart = (e: MouseEvent): void => {
+        if (e.button == 0) {
+            this.mSchedule.selection_click(this.mSchedule.getElementID(<HTMLElement>e.target), true)
+            this.mSelecting = true;
+            let cell = this.mSchedule.getElementDetails(<HTMLElement>e.target);
+            this.mFloat.show(<HTMLElement>e.target, cell.data.value.toString());
+        } else {
+            this.mSelecting = false;
         }
         e.preventDefault();
     }
-    private onDragEnd = (e: Event): void => {
+    private onDrag = (e: MouseEvent): void => {
+        if (e.buttons == 1) {
+            if (this.mSelecting) {
+                this.mSchedule.selection_click(this.mSchedule.getElementID(<HTMLElement>e.target), false)
+            }
+        } else {
+            this.mSelecting = false;
+        }
+        e.preventDefault();
+    }
+    private onDragEnd = (e: MouseEvent): void => {
         this.mSchedule.selection_click(this.mSchedule.getElementID(<HTMLElement>e.target), false)
         this.mSelecting = false;
-        //e.preventDefault();
+        e.preventDefault();
     }
 
-    private onClick(e : any) {
-        let cell = this.mSchedule.getElementDetails(e.target);
+    private onClick(e : MouseEvent) {
+        let cell = this.mSchedule.getElementDetails(<HTMLElement>e.target);
         this.mSchedule.selection_click(cell.id, true);
-        
-        //this.mFloat.show(e.target, cell.data.value.toString());
+        this.mFloat.show(<HTMLElement>e.target, cell.data.value.toString());
     }
 
     show() : void {

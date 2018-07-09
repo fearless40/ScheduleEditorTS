@@ -72,27 +72,30 @@ class Selection {
         //this.click(this.mRow_end + rowCount, this.mCol_end + colCount);
         this.mRow_end += rowCount;
         this.mCol_end += colCount;
-        //this.normalize();
+        this.normalize();
     }
     click(rowId, colId) {
         if (!this.isActive) {
             this.set(rowId, colId);
             return;
         }
-        if (rowId <= this.mRow_start) {
+        /*if (rowId <= this.mRow_start) {
             //this.mRow_end = this.mRow_start
             this.mRow_start = rowId;
         }
         else {
             this.mRow_end = rowId;
         }
+
         if (colId <= this.mCol_start) {
             //this.mCol_end = this.mCol_start
             this.mCol_start = colId;
         }
         else {
             this.mCol_end = colId;
-        }
+        }*/
+        this.mCol_end = colId;
+        this.mRow_end = rowId;
         this.normalize();
     }
     normalize() {
@@ -381,7 +384,7 @@ export class ScheduleWidget {
         this.mRoot = this.mParentElement.lastChild;
         grid = null;
         // Currently a quick hack should make it ignore the header cells
-        this.mCurrentSelection = new Selection(2, this.mHtmlCells.length, 2, this.mHtmlCells[0].length);
+        this.mCurrentSelection = new Selection(2, this.mHtmlCells.length - 1, 2, this.mHtmlCells[0].length - 1);
     }
 }
 //# sourceMappingURL=ScheduleWidget.js.map
