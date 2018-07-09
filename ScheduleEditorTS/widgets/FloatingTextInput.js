@@ -5,6 +5,7 @@ export class FloatingTextInput {
         this.mElement.classList.add("widget-input-text");
     }
     show(parent, value) {
+        this.hide();
         this.mParent = parent;
         this.mElement.value = value;
         //this.mElement.selectionStart = 0;

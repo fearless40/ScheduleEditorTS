@@ -69,9 +69,10 @@ class Selection {
         this.normalize();
     }
     grow(rowCount, colCount) {
+        //this.click(this.mRow_end + rowCount, this.mCol_end + colCount);
         this.mRow_end += rowCount;
         this.mCol_end += colCount;
-        this.normalize();
+        //this.normalize();
     }
     click(rowId, colId) {
         if (!this.isActive) {
@@ -82,9 +83,6 @@ class Selection {
             //this.mRow_end = this.mRow_start
             this.mRow_start = rowId;
         }
-        else if (rowId >= this.mRow_end) {
-            this.mRow_end = rowId;
-        }
         else {
             this.mRow_end = rowId;
         }
@@ -92,70 +90,122 @@ class Selection {
             //this.mCol_end = this.mCol_start
             this.mCol_start = colId;
         }
-        else if (colId >= this.mCol_end) {
-            this.mCol_end = colId;
-        }
-        else if (colId > this.mCol_start && colId < this.mCol_end) {
+        else {
             this.mCol_end = colId;
         }
         this.normalize();
     }
     normalize() {
-        if (this.mRow_end < this.mRow_start) {
-            // Swapping with destructuring
-            [this.mRow_start, this.mRow_end] = [this.mRow_end, this.mRow_start];
-        }
-        if (this.mCol_end < this.mCol_start) {
-            [this.mCol_start, this.mCol_end] = [this.mCol_end, this.mCol_start];
-        }
+        /* if (this.mRow_end < this.mRow_start) {
+             // Swapping with destructuring
+             [this.mRow_start, this.mRow_end] = [this.mRow_end, this.mRow_start];
+         }
+ 
+         if (this.mCol_end < this.mCol_start) {
+             [this.mCol_start, this.mCol_end] = [this.mCol_end, this.mCol_start];
+         }
+         */
         if (this.mRow_start < this.row_min) {
             this.mRow_start = this.row_min;
+        }
+        ;
+        if (this.mRow_start > this.row_max) {
+            this.mRow_start = this.row_max;
         }
         ;
         if (this.mRow_end > this.row_max) {
             this.mRow_end = this.row_max;
         }
         ;
+        if (this.mRow_end < this.row_min) {
+            this.mRow_end = this.row_min;
+        }
+        ;
         if (this.mCol_start < this.col_min) {
             this.mCol_start = this.col_min;
         }
         ;
+        if (this.mCol_start > this.col_max) {
+            this.mCol_start = this.col_max;
+        }
+        ;
         if (this.mCol_end > this.col_max) {
-            this.mCol_end = this.col_end;
+            this.mCol_end = this.col_max;
+        }
+        ;
+        if (this.mCol_end < this.col_min) {
+            this.mCol_end = this.col_min;
         }
         ;
     }
     //Helper functions take a function
     topRow(cb) {
-        for (let colIndex = this.mCol_start; colIndex <= this.mCol_end; ++colIndex) {
-            cb({ row: this.mRow_start, col: colIndex });
+        //let dir = this.mCol_start <= this.mCol_end ? 1 : -1;
+        let cstart = this.mCol_start, cend = this.mCol_end;
+        let row = this.mRow_start < this.mRow_end ? this.mRow_start : this.mRow_end;
+        if (cstart > cend) {
+            [cstart, cend] = [cend, cstart];
+        }
+        for (let colIndex = cstart; colIndex <= cend; ++colIndex) {
+            cb({ row: row, col: colIndex });
         }
     }
     bottomRow(cb) {
-        for (let colIndex = this.mCol_start; colIndex <= this.mCol_end; ++colIndex) {
-            cb({ row: this.mRow_end, col: colIndex });
+        let cstart = this.mCol_start, cend = this.mCol_end;
+        if (cstart > cend) {
+            [cstart, cend] = [cend, cstart];
+        }
+        let row = this.mRow_start > this.mRow_end ? this.mRow_start : this.mRow_end;
+        for (let colIndex = cstart; colIndex <= cend; ++colIndex) {
+            cb({ row: row, col: colIndex });
         }
     }
     leftCol(cb) {
-        for (let rowIndex = this.mRow_start; rowIndex <= this.mRow_end; ++rowIndex) {
-            cb({ row: rowIndex, col: this.mCol_start });
+        let rstart = this.mRow_start, rend = this.mRow_end;
+        let col = this.mCol_start < this.mCol_end ? this.mCol_start : this.mCol_end;
+        if (rstart > rend) {
+            [rstart, rend] = [rend, rstart];
+        }
+        for (let rowIndex = rstart; rowIndex <= rend; ++rowIndex) {
+            cb({ row: rowIndex, col: col });
         }
     }
     rightCol(cb) {
-        for (let rowIndex = this.mRow_start; rowIndex <= this.mRow_end; ++rowIndex) {
-            cb({ row: rowIndex, col: this.mCol_end });
+        let rstart = this.mRow_start, rend = this.mRow_end;
+        if (rstart > rend) {
+            [rstart, rend] = [rend, rstart];
+        }
+        let col = this.mCol_start > this.mCol_end ? this.mCol_start : this.mCol_end;
+        for (let rowIndex = rstart; rowIndex <= rend; ++rowIndex) {
+            cb({ row: rowIndex, col: col });
         }
     }
     bodyOnly(cb) {
-        for (let rowIndex = this.mRow_start + 1; rowIndex < this.mRow_end; ++rowIndex) {
-            for (let colIndex = this.mCol_start + 1; colIndex < this.mCol_end; ++colIndex) {
+        let rstart = this.mRow_start, rend = this.mRow_end;
+        if (rstart > rend) {
+            [rstart, rend] = [rend, rstart];
+        }
+        let cstart = this.mCol_start, cend = this.mCol_end;
+        if (cstart > cend) {
+            [cstart, cend] = [cend, cstart];
+        }
+        for (let rowIndex = rstart + 1; rowIndex <= rend - 1; ++rowIndex) {
+            for (let colIndex = cstart + 1; colIndex <= cend - 1; ++colIndex) {
                 cb({ row: rowIndex, col: colIndex });
             }
         }
     }
     allCells(cb) {
-        for (let rowIndex = this.mRow_start; rowIndex <= this.mRow_end; ++rowIndex) {
-            for (let colIndex = this.mCol_start; colIndex <= this.mCol_end; ++colIndex) {
+        let rstart = this.mRow_start, rend = this.mRow_end;
+        if (rstart > rend) {
+            [rstart, rend] = [rend, rstart];
+        }
+        let cstart = this.mCol_start, cend = this.mCol_end;
+        if (cstart > cend) {
+            [cstart, cend] = [cend, cstart];
+        }
+        for (let rowIndex = rstart; rowIndex <= rend; ++rowIndex) {
+            for (let colIndex = cstart; colIndex <= cend; ++colIndex) {
                 cb({ row: rowIndex, col: colIndex });
             }
         }
@@ -217,6 +267,9 @@ export class ScheduleWidget {
     selection_move(rows, cols) {
     }
     selection_grow(rows, cols) {
+        this.selection_render_clear(this.mCurrentSelection);
+        this.mCurrentSelection.grow(rows, cols);
+        this.selection_render_all(this.mCurrentSelection);
     }
     selection_clear() {
         this.selection_render_clear(this.mCurrentSelection);
@@ -226,6 +279,7 @@ export class ScheduleWidget {
         this.selection_render_clear(this.mCurrentSelection);
         if (newClick) {
             this.mCurrentSelection.set(id.row, id.col);
+            this.mHtmlCells[id.row][id.col].element.focus();
         }
         else {
             this.mCurrentSelection.click(id.row, id.col);

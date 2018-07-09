@@ -11,6 +11,7 @@ export class FloatingTextInput {
     }
 
     show(parent: HTMLElement, value : string): void {
+        this.hide();
         this.mParent = parent;
         this.mElement.value = value;
         //this.mElement.selectionStart = 0;

@@ -2,6 +2,14 @@ import { ScheduleWidget } from "../widgets/ScheduleWidget.js";
 import { FloatingTextInput } from "../widgets/FloatingTextInput.js";
 export class TableEditor {
     constructor(parentNode, layout) {
+        this.onKeyDown = (e) => {
+            if (e.shiftKey) {
+                this.onKeyDownSelection(e);
+                return;
+            }
+        };
+        this.onKeyUp = (e) => {
+        };
         this.onDragStart = (e) => {
             this.mSchedule.selection_click(this.mSchedule.getElementID(e.target), true);
             this.mSelecting = true;
@@ -27,18 +35,33 @@ export class TableEditor {
         this.mSchedule.root.addEventListener('mousedown', this.onDragStart);
         this.mSchedule.root.addEventListener('mousemove', this.onDrag);
         this.mSchedule.root.addEventListener('mouseup', this.onDragEnd);
+        window.addEventListener('keydown', this.onKeyDown);
+        window.addEventListener('keyup', this.onKeyUp);
+    }
+    onKeyDownSelection(e) {
+        let advanceBy = 1;
+        if (e.ctrlKey) {
+            advanceBy = 5;
+        }
+        switch (e.code) {
+            case 'ArrowDown':
+                this.mSchedule.selection_grow(advanceBy, 0);
+                break;
+            case 'ArrowLeft':
+                this.mSchedule.selection_grow(0, -advanceBy);
+                break;
+            case 'ArrowRight':
+                this.mSchedule.selection_grow(0, advanceBy);
+                break;
+            case 'ArrowUp':
+                this.mSchedule.selection_grow(-advanceBy, 0);
+                break;
+        }
     }
     onClick(e) {
-        //this.mSchedule.selection_click(this.mSchedule.getElementID(<HTMLElement>e.target))
-        // this.mFloat.hide();
-        // let cell = this.mSchedule.getElementDetails(e.target);
-        // this.mFloat.show(e.target, cell.data.value.toString());
-        /*let eId = this.mSchedule.getElementID(e.target);
-        let eIds = [];
-        eIds.push(eId);
-        let values = [];
-        values.push("yo");
-        this.mSchedule.change(eIds,values);*/
+        let cell = this.mSchedule.getElementDetails(e.target);
+        this.mSchedule.selection_click(cell.id, true);
+        //this.mFloat.show(e.target, cell.data.value.toString());
     }
     show() {
         this.mSchedule.render(this.mLayout);

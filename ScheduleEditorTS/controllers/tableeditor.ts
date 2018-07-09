@@ -19,6 +19,45 @@ export class TableEditor {
         this.mSchedule.root.addEventListener('mousedown', this.onDragStart);
         this.mSchedule.root.addEventListener('mousemove', this.onDrag);
         this.mSchedule.root.addEventListener('mouseup', this.onDragEnd);
+        window.addEventListener('keydown', this.onKeyDown);
+        window.addEventListener('keyup', this.onKeyUp);
+    }
+
+    private onKeyDownSelection(e: KeyboardEvent): void {
+        let advanceBy = 1;
+        if (e.ctrlKey) {
+            advanceBy = 5;
+        }
+
+        switch (e.code) {
+            case 'ArrowDown':
+                this.mSchedule.selection_grow(advanceBy, 0);
+                break;
+
+            case 'ArrowLeft':
+                this.mSchedule.selection_grow(0, -advanceBy);
+                break;
+
+            case 'ArrowRight':
+                this.mSchedule.selection_grow(0, advanceBy);
+                break;
+
+            case 'ArrowUp':
+                this.mSchedule.selection_grow(-advanceBy, 0);
+                break;
+        }
+    }
+
+
+    private onKeyDown = (e: KeyboardEvent): void => {
+        if (e.shiftKey) {
+            this.onKeyDownSelection(e);
+            return;
+        }
+    }
+
+    private onKeyUp = (e: Event): void => {
+
     }
 
     private onDragStart = (e: Event): void => {
@@ -39,16 +78,10 @@ export class TableEditor {
     }
 
     private onClick(e : any) {
-        //this.mSchedule.selection_click(this.mSchedule.getElementID(<HTMLElement>e.target))
-        // this.mFloat.hide();
-       // let cell = this.mSchedule.getElementDetails(e.target);
-       // this.mFloat.show(e.target, cell.data.value.toString());
-        /*let eId = this.mSchedule.getElementID(e.target);
-        let eIds = [];
-        eIds.push(eId);
-        let values = [];
-        values.push("yo");
-        this.mSchedule.change(eIds,values);*/
+        let cell = this.mSchedule.getElementDetails(e.target);
+        this.mSchedule.selection_click(cell.id, true);
+        
+        //this.mFloat.show(e.target, cell.data.value.toString());
     }
 
     show() : void {
