@@ -1,4 +1,4 @@
-import { Datum } from "../data/DataItemHelpers.js";
+import { Datum, ReadonlyDataItem } from "../data/DataItemHelpers.js";
 class ColItem {
     constructor() {
         this.value = "";
@@ -9,6 +9,15 @@ class ColItem {
 }
 ;
 ;
+export class ScheduleCellID {
+    constructor(row, col) {
+        this.row = row;
+        this.col = col;
+    }
+    get isValid() {
+        return !isNaN(this.row) || !isNaN(this.col);
+    }
+}
 class HtmlCell {
     constructor(element, data) {
         this.mElement = element;
@@ -79,35 +88,11 @@ class Selection {
             this.set(rowId, colId);
             return;
         }
-        /*if (rowId <= this.mRow_start) {
-            //this.mRow_end = this.mRow_start
-            this.mRow_start = rowId;
-        }
-        else {
-            this.mRow_end = rowId;
-        }
-
-        if (colId <= this.mCol_start) {
-            //this.mCol_end = this.mCol_start
-            this.mCol_start = colId;
-        }
-        else {
-            this.mCol_end = colId;
-        }*/
         this.mCol_end = colId;
         this.mRow_end = rowId;
         this.normalize();
     }
     normalize() {
-        /* if (this.mRow_end < this.mRow_start) {
-             // Swapping with destructuring
-             [this.mRow_start, this.mRow_end] = [this.mRow_end, this.mRow_start];
-         }
- 
-         if (this.mCol_end < this.mCol_start) {
-             [this.mCol_start, this.mCol_end] = [this.mCol_end, this.mCol_start];
-         }
-         */
         if (this.mRow_start < this.row_min) {
             this.mRow_start = this.row_min;
         }
@@ -255,6 +240,9 @@ export class ScheduleWidget {
             sel.allCells(cb);
         }
     }
+    isIDValid(id) {
+        return !isNaN(id.row) || !isNaN(id.col);
+    }
     selection_render_all(sel) {
         let that = this;
         sel.topRow((id) => that.mHtmlCells[id.row][id.col].element.classList.add("schedule-select-top" /* TopBorder */, "schedule-select" /* Selected */));
@@ -266,6 +254,12 @@ export class ScheduleWidget {
     selection_setByRowCol(row, col) {
     }
     selection_setByData(id, owner) {
+    }
+    selection_advance(rows, cols) {
+        this.selection_render_clear(this.mCurrentSelection);
+        this.mCurrentSelection.set(this.mCurrentSelection.row_start + rows, this.mCurrentSelection.col_start + cols);
+        this.selection_render_all(this.mCurrentSelection);
+        return new ScheduleCellID(this.mCurrentSelection.row_start, this.mCurrentSelection.col_start);
     }
     selection_move(rows, cols) {
     }
@@ -279,6 +273,9 @@ export class ScheduleWidget {
         this.mCurrentSelection.clear();
     }
     selection_click(id, newClick) {
+        if (!this.isIDValid(id)) {
+            return;
+        }
         this.selection_render_clear(this.mCurrentSelection);
         if (newClick) {
             this.mCurrentSelection.set(id.row, id.col);
@@ -305,15 +302,33 @@ export class ScheduleWidget {
          console.log(row == parseInt(element.getAttribute(SWAttributes.RowIndex)));
          console.log(col == parseInt(element.getAttribute(SWAttributes.ColIndex)));
          */
-        return { row: parseInt(element.getAttribute("data-row" /* RowIndex */)),
-            col: parseInt(element.getAttribute("data-col" /* ColIndex */)) };
+        return new ScheduleCellID(parseInt(element.getAttribute("data-row" /* RowIndex */)), parseInt(element.getAttribute("data-col" /* ColIndex */)));
+    }
+    getCellDetails(id) {
+        if (this.isIDValid(id)) {
+            return {
+                id: new ScheduleCellID(id.row, id.col),
+                data: new Datum(this.mHtmlCells[id.row][id.col].element.textContent, this.mHtmlCells[id.row][id.col].id, this.mHtmlCells[id.row][id.col].owner)
+            };
+        }
+        else {
+            return {
+                id: new ScheduleCellID(id.row, id.col),
+                data: new ReadonlyDataItem("")
+            };
+        }
     }
     getElementDetails(element) {
         let id = this.getElementID(element);
-        return {
-            id: id,
-            data: new Datum(element.textContent, this.mHtmlCells[id.row][id.col].id, this.mHtmlCells[id.row][id.col].owner)
-        };
+        return this.getCellDetails(id);
+    }
+    getHtmlElement(id) {
+        if (this.isIDValid(id)) {
+            return this.mHtmlCells[id.row][id.col].element;
+        }
+        else {
+            return null;
+        }
     }
     change(elementIds, values) {
         // Fire onchange event before writing to the element

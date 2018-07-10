@@ -1,6 +1,6 @@
 ﻿import { LayoutTable } from "../view/TableLayout.js";
 import { DataItem, DataView, EventOnChange, DataChangedBy} from "../data/Data.js";
-import { Datum } from "../data/DataItemHelpers.js";
+import { Datum, ReadonlyDataItem } from "../data/DataItemHelpers.js";
 
 class ColItem {
     constructor() {}
@@ -31,8 +31,15 @@ export interface ScheduleWidgetID {
     col: number
 };
 
+export class ScheduleCellID implements ScheduleWidgetID{
+    constructor(public row: number, public col: number) { }
+    get isValid() : boolean {
+        return !isNaN(this.row) || !isNaN(this.col);
+    }
+}
+
 export interface ScheduleWidgetCellInfo {
-    id: ScheduleWidgetID
+    id: ScheduleCellID 
     data: DataItem
 }
 
@@ -271,6 +278,10 @@ export class ScheduleWidget {
         }
     }
 
+    private isIDValid(id: ScheduleWidgetID): boolean {
+        return !isNaN(id.row) || !isNaN(id.col);
+    }
+
     private selection_render_all(sel: Selection) {
         let that = this;
         sel.topRow((id) => that.mHtmlCells[id.row][id.col].element.classList.add(CssSelection.TopBorder, CssSelection.Selected));
@@ -286,6 +297,14 @@ export class ScheduleWidget {
 
     selection_setByData(id: number, owner: DataView) {
 
+    }
+
+    selection_advance(rows: number, cols: number): ScheduleCellID {
+        this.selection_render_clear(this.mCurrentSelection);
+        this.mCurrentSelection.set(this.mCurrentSelection.row_start + rows,
+            this.mCurrentSelection.col_start + cols);
+        this.selection_render_all(this.mCurrentSelection);
+        return new ScheduleCellID(this.mCurrentSelection.row_start, this.mCurrentSelection.col_start);
     }
 
     selection_move(rows: number, cols: number): void {
@@ -304,6 +323,7 @@ export class ScheduleWidget {
     }
 
     selection_click(id: ScheduleWidgetID, newClick:boolean) {
+        if (!this.isIDValid(id)) { return; }
         this.selection_render_clear(this.mCurrentSelection);
         if (newClick) {
             this.mCurrentSelection.set(id.row, id.col);
@@ -316,7 +336,7 @@ export class ScheduleWidget {
     }
 
 
-    getElementID(element: HTMLElement): ScheduleWidgetID {
+    getElementID(element: HTMLElement): ScheduleCellID {
        /* let row = -1, col = -1;
         switch (element.tagName) {
             case "TH":
@@ -332,17 +352,38 @@ export class ScheduleWidget {
         console.log(row == parseInt(element.getAttribute(SWAttributes.RowIndex)));
         console.log(col == parseInt(element.getAttribute(SWAttributes.ColIndex)));
         */
-        return {row: parseInt(element.getAttribute(SWAttributes.RowIndex)),
-                col: parseInt(element.getAttribute(SWAttributes.ColIndex))};
+        return new ScheduleCellID(parseInt(element.getAttribute(SWAttributes.RowIndex)),
+                                  parseInt(element.getAttribute(SWAttributes.ColIndex)));
+    }
+
+    getCellDetails(id: ScheduleWidgetID): ScheduleWidgetCellInfo {
+        if (this.isIDValid(id)) {
+            return {
+                id: new ScheduleCellID(id.row,id.col),
+                data: new Datum(this.mHtmlCells[id.row][id.col].element.textContent,
+                    this.mHtmlCells[id.row][id.col].id,
+                    this.mHtmlCells[id.row][id.col].owner)
+            };
+        } else {
+            return {
+                id: new ScheduleCellID(id.row, id.col),
+                data: new ReadonlyDataItem("")
+            };
+        }
+
     }
 
     getElementDetails(element: HTMLElement): ScheduleWidgetCellInfo {
         let id = this.getElementID(element);
-        return {
-            id : id,
-            data: new Datum(element.textContent,
-                this.mHtmlCells[id.row][id.col].id,
-                this.mHtmlCells[id.row][id.col].owner)
+        return this.getCellDetails(id);
+    }
+
+    getHtmlElement(id: ScheduleWidgetID): HTMLElement {
+        if (this.isIDValid(id)) {
+            return this.mHtmlCells[id.row][id.col].element;
+        }
+        else {
+            return null;
         }
     }
 
