@@ -74,7 +74,32 @@ export class ScheduleSlotData {
             return new Datum(this.mData[rc.row][rc.col], dataID, this);
         }
     }
+    value_change(id, value) {
+        const rc = this.extractRowCol(id);
+        if (rc.row > this.maxCountRows() || rc.row < 0) {
+            return false;
+        }
+        if (rc.col > this.maxCountCols() || rc.col < 0) {
+            return false;
+        }
+        this.mData[rc.row][rc.col] = value.toString();
+        return true;
+    }
     modify(ids, values) {
+        let retids = new Array();
+        let retvalues = new Array();
+        for (let i = 0; i < ids.length; ++i) {
+            if (this.value_change(ids[i], values[i])) {
+                retids.push(ids[i]);
+                retvalues.push(values[i]);
+            }
+        }
+        this.events.fire({
+            owner: this,
+            ids: retids,
+            values: retvalues,
+            who: [0 /* User */]
+        });
         return { isOk: true };
     }
 }

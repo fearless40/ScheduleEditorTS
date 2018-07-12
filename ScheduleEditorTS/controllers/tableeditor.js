@@ -22,11 +22,11 @@ export class TableEditor {
             }
             else {
                 let cell = this.mSchedule.getElementDetails(e.target);
-                if (e.button == 0) {
+                if (e.button == 0 && cell.id.isValid) {
+                    this.cellEditor_store();
+                    this.cellEditor_move(e.target, cell.data.value.toString());
                     this.mSchedule.selection_click(cell.id, true);
                     this.mSelecting = true;
-                    this.mFloat.show(e.target, cell.data.value.toString());
-                    this.setCellEdit(false);
                 }
                 else {
                     this.mSelecting = false;
@@ -80,6 +80,62 @@ export class TableEditor {
             this.mFloat.root.classList.remove("widget-hide-caret");
         }
     }
+    cellEditor_store() {
+        if (this.mFloat.isDirty) {
+            // Need to retieve the id of the cell that it is editing
+            const cid = this.mSchedule.selection_firstcell;
+            const cell = this.mSchedule.cell_details(cid);
+            this.process_change(cell, this.mFloat.value);
+            this.mFloat.dirty_reset();
+        }
+    }
+    cellEditor_move(element, value) {
+        this.setCellEdit(false);
+        // Now set the editor to the new cell
+        if (element instanceof HTMLElement) {
+            this.mFloat.show(element, value);
+        }
+        else {
+            this.mFloat.show(this.mSchedule.getHtmlElement(element), value);
+        }
+    }
+    process_change(cell, newValue) {
+        if (cell.data.value.toString() != newValue) {
+            cell.data.owner.modify([cell.data.id], [newValue]);
+        }
+    }
+    process_changes(cells, newValues) {
+        let owner = cells[0].data.owner;
+        let batchId = new Array();
+        let batchval = new Array();
+        for (let i = 0; i < cells.length; ++i) {
+            if (owner != cells[i].data.owner) {
+                owner.modify(batchId, batchval);
+                owner = cells[i].data.owner;
+                batchId = new Array();
+                batchval = new Array();
+            }
+            else {
+                batchId.push(cells[i].data.id);
+                batchval.push(newValues[i]);
+            }
+        }
+        owner.modify(batchId, batchval);
+    }
+    selection_advance(row, col) {
+        this.cellEditor_store();
+        const newId = this.mSchedule.selection_advance(row, col);
+        if (newId.isValid) {
+            this.cellEditor_move(newId, this.mSchedule.cell_value(newId));
+        }
+    }
+    selection_delete() {
+        const ids = this.mSchedule.selection_get().asArray();
+        const values = new Array(ids.length);
+        values.fill("");
+        this.process_changes(ids, values);
+        this.cellEditor_move(this.mSchedule.selection_firstcell, "");
+    }
     onKeyDownSelection(e) {
         let advanceBy = 1;
         if (e.ctrlKey) {
@@ -114,24 +170,26 @@ export class TableEditor {
         let cellID = null;
         switch (e.code) {
             case "ArrowLeft":
-                cellID = this.mSchedule.selection_advance(0, -1);
+                this.selection_advance(0, -1);
+                e.preventDefault();
                 break;
             case "Tab":
             case "ArrowRight":
-                cellID = this.mSchedule.selection_advance(0, 1);
+                this.selection_advance(0, 1);
+                e.preventDefault();
                 break;
             case "ArrowUp":
-                cellID = this.mSchedule.selection_advance(-1, 0);
+                this.selection_advance(-1, 0);
+                e.preventDefault();
                 break;
             case "Enter":
             case "ArrowDown":
-                cellID = this.mSchedule.selection_advance(1, 0);
+                this.selection_advance(1, 0);
+                e.preventDefault();
                 break;
-        }
-        if (cellID) {
-            this.mFloat.show(this.mSchedule.getHtmlElement(cellID), this.mSchedule.getCellDetails(cellID).data.value.toString());
-            this.setCellEdit(false);
-            e.preventDefault();
+            case "Delete":
+                this.selection_delete();
+                e.preventDefault();
         }
     }
     show() {

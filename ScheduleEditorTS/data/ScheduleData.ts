@@ -1,4 +1,4 @@
-﻿import { DataTable, DataItem, DataValue, onChangeResults, DataChangedBy, EventOnChange} from "./Data.js"
+﻿import { DataView, DataTable, DataItem, DataValue, onChangeResults, DataChangedBy, EventOnChange} from "./Data.js"
 import { Datum } from "./DataItemHelpers.js"
 import {EventSimple} from "../util/EventSimple.js"
 /*
@@ -110,8 +110,32 @@ export class ScheduleSlotData implements DataTable{
         }
     }
     
+    private value_change(id: number, value: DataValue) : boolean {
+        const rc = this.extractRowCol(id);
+        if (rc.row > this.maxCountRows() || rc.row < 0) { return false; }
+        if (rc.col > this.maxCountCols() || rc.col < 0) { return false; }
+        this.mData[rc.row][rc.col] = value.toString();
+        return true;
+    }
+    
     public modify(ids: number[], values: DataValue[]): onChangeResults {
-        return {isOk: true}
+        let retids = new Array<number>();
+        let retvalues = new Array<DataValue>();
+
+        for (let i = 0; i < ids.length; ++i) {
+            if (this.value_change(ids[i], values[i])) {
+                retids.push(ids[i]);
+                retvalues.push(values[i]);
+            }
+        }
+
+        this.events.fire({
+            owner: <DataView> this,
+            ids: retids,
+            values: retvalues,
+            who: [DataChangedBy.User]
+        });
+        return { isOk: true };
     }
 
     readonly events: EventSimple<EventOnChange>

@@ -199,6 +199,42 @@ class Selection {
         }
     }
 }
+export class ReadOnlySelection {
+    constructor(mRow_start, mRow_end, mCol_start, mCol_end, parent) {
+        this.mRow_start = mRow_start;
+        this.mRow_end = mRow_end;
+        this.mCol_start = mCol_start;
+        this.mCol_end = mCol_end;
+        this.parent = parent;
+        if (mRow_start > mRow_end) {
+            [mRow_start, mRow_end] = [mRow_end, mRow_start];
+        }
+        if (mCol_start > mCol_end) {
+            [mCol_start, mCol_end] = [mCol_end, mCol_start];
+        }
+    }
+    get row_start() { return this.mRow_start; }
+    get row_end() { return this.mRow_end; }
+    get col_start() { return this.mCol_start; }
+    get col_end() { return this.mCol_end; }
+    get isSingleCell() {
+        return (this.mRow_start == this.mRow_start && this.mCol_end == this.mCol_start);
+    }
+    forEach(cb) {
+        // Doing it by row as this will lead to more efficent processing for batches of data.'
+        // Most rows are made of the same owner therefore more can be batched at once
+        for (let col = this.mCol_start; col <= this.mCol_end; ++col) {
+            for (let row = this.mRow_start; row <= this.mRow_end; ++row) {
+                cb(this.parent.cell_details({ row: row, col: col }));
+            }
+        }
+    }
+    asArray() {
+        let ret = new Array();
+        this.forEach((value) => ret.push(value));
+        return ret;
+    }
+}
 export class ScheduleWidget {
     constructor(parent) {
         this.onChange = (e) => {
@@ -251,6 +287,9 @@ export class ScheduleWidget {
         sel.leftCol((id) => that.mHtmlCells[id.row][id.col].element.classList.add("schedule-select-left" /* LeftBorder */, "schedule-select" /* Selected */));
         sel.bodyOnly((id) => that.mHtmlCells[id.row][id.col].element.classList.add("schedule-select" /* Selected */));
     }
+    selection_get() {
+        return new ReadOnlySelection(this.mCurrentSelection.row_start, this.mCurrentSelection.row_end, this.mCurrentSelection.col_start, this.mCurrentSelection.col_end, this);
+    }
     selection_setByRowCol(row, col) {
     }
     selection_setByData(id, owner) {
@@ -286,6 +325,34 @@ export class ScheduleWidget {
         }
         this.selection_render_all(this.mCurrentSelection);
     }
+    get selection_firstcell() {
+        return {
+            row: this.mCurrentSelection.row_start,
+            col: this.mCurrentSelection.col_start
+        };
+    }
+    cell_value(id) {
+        if (this.isIDValid(id)) {
+            return this.mHtmlCells[id.row][id.col].element.textContent;
+        }
+        else {
+            return "";
+        }
+    }
+    cell_details(id) {
+        if (this.isIDValid(id)) {
+            return {
+                id: new ScheduleCellID(id.row, id.col),
+                data: new Datum(this.mHtmlCells[id.row][id.col].element.textContent, this.mHtmlCells[id.row][id.col].id, this.mHtmlCells[id.row][id.col].owner)
+            };
+        }
+        else {
+            return {
+                id: new ScheduleCellID(id.row, id.col),
+                data: new ReadonlyDataItem("")
+            };
+        }
+    }
     getElementID(element) {
         /* let row = -1, col = -1;
          switch (element.tagName) {
@@ -304,23 +371,9 @@ export class ScheduleWidget {
          */
         return new ScheduleCellID(parseInt(element.getAttribute("data-row" /* RowIndex */)), parseInt(element.getAttribute("data-col" /* ColIndex */)));
     }
-    getCellDetails(id) {
-        if (this.isIDValid(id)) {
-            return {
-                id: new ScheduleCellID(id.row, id.col),
-                data: new Datum(this.mHtmlCells[id.row][id.col].element.textContent, this.mHtmlCells[id.row][id.col].id, this.mHtmlCells[id.row][id.col].owner)
-            };
-        }
-        else {
-            return {
-                id: new ScheduleCellID(id.row, id.col),
-                data: new ReadonlyDataItem("")
-            };
-        }
-    }
     getElementDetails(element) {
         let id = this.getElementID(element);
-        return this.getCellDetails(id);
+        return this.cell_details(id);
     }
     getHtmlElement(id) {
         if (this.isIDValid(id)) {

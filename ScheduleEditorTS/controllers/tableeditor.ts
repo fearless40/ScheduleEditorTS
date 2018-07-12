@@ -1,7 +1,8 @@
-﻿import {ScheduleWidget, ScheduleWidgetID, ScheduleCellID} from "../widgets/ScheduleWidget.js";
+﻿import {ScheduleWidget, ScheduleWidgetID, ScheduleCellID, ScheduleWidgetCellInfo, ReadOnlySelection, ReadOnlySelectionCB} from "../widgets/ScheduleWidget.js";
 import { LayoutTable } from "../view/TableLayout.js"
 import { FloatingTextInput } from "../widgets/FloatingTextInput.js";
 import { Cell } from "../view/Cell.js";
+import { DataView, DataValue } from "../data/Data.js";
 
 export class TableEditor {
     private mSchedule : ScheduleWidget;
@@ -32,7 +33,71 @@ export class TableEditor {
         else {
             this.mFloat.root.classList.remove("widget-hide-caret");
         }
+    }
 
+    private cellEditor_store(): void {
+        if (this.mFloat.isDirty) {
+            // Need to retieve the id of the cell that it is editing
+            const cid = this.mSchedule.selection_firstcell;
+            const cell = this.mSchedule.cell_details(cid);
+            this.process_change(cell, this.mFloat.value);
+            this.mFloat.dirty_reset();
+        }
+    }
+
+    private cellEditor_move(element : HTMLElement | ScheduleWidgetID, value : string): void {
+        this.setCellEdit(false);
+
+        // Now set the editor to the new cell
+        if (element instanceof HTMLElement ) {
+            this.mFloat.show(element, value);
+        }
+        else {
+            this.mFloat.show(this.mSchedule.getHtmlElement(element), value);
+        }
+    }
+
+    private process_change(cell : ScheduleWidgetCellInfo, newValue : string): void {
+        if (cell.data.value.toString() != newValue) {
+            cell.data.owner.modify([cell.data.id], [newValue]);
+        }
+    }
+
+    private process_changes(cells: ScheduleWidgetCellInfo[], newValues: string[]): void {
+        let owner: DataView = cells[0].data.owner;
+        let batchId = new Array<number>();
+        let batchval = new Array<DataValue>();
+
+        for (let i = 0; i < cells.length; ++i) {
+            if (owner != cells[i].data.owner) {
+                owner.modify(batchId, batchval);
+
+                owner = cells[i].data.owner;
+                batchId = new Array<number>();
+                batchval = new Array<DataValue>();
+            }
+            else {
+                batchId.push(cells[i].data.id);
+                batchval.push(newValues[i]);
+            }
+        }
+        owner.modify(batchId, batchval);
+    }
+
+    private selection_advance(row: number, col: number) {
+        this.cellEditor_store();
+        const newId = this.mSchedule.selection_advance(row, col);
+        if (newId.isValid) {
+            this.cellEditor_move(newId, this.mSchedule.cell_value(newId));
+        }
+    }
+
+    private selection_delete() {
+        const ids = this.mSchedule.selection_get().asArray();
+        const values = new Array<string>(ids.length);
+        values.fill("");
+        this.process_changes(ids, values);
+        this.cellEditor_move(this.mSchedule.selection_firstcell, "");
     }
 
     private onKeyDownSelection(e: KeyboardEvent): void {
@@ -75,28 +140,29 @@ export class TableEditor {
         let cellID: ScheduleCellID = null;
         switch (e.code) {
             case "ArrowLeft":
-                cellID = this.mSchedule.selection_advance(0, -1);
+                this.selection_advance(0, -1);
+                e.preventDefault();
                 break;
             case "Tab":
             case "ArrowRight":
-                cellID = this.mSchedule.selection_advance(0, 1);
+                this.selection_advance(0, 1);
+                e.preventDefault();
                 break;
             case "ArrowUp":
-                cellID = this.mSchedule.selection_advance(-1, 0);
+                this.selection_advance(-1, 0);
+                e.preventDefault();
                 break;
             case "Enter":
             case "ArrowDown":
-                cellID = this.mSchedule.selection_advance(1,  0);
+                this.selection_advance(1, 0);
+                e.preventDefault();
                 break;
+            case "Delete":
+                this.selection_delete();
+                e.preventDefault();
+
                 
         }
-        if (cellID) {
-            this.mFloat.show(this.mSchedule.getHtmlElement(cellID),
-                this.mSchedule.getCellDetails(cellID).data.value.toString());
-            this.setCellEdit(false);
-            e.preventDefault();
-        }
-        
     } 
 
     private onKeyDown = (e: KeyboardEvent): void => {
@@ -124,11 +190,11 @@ export class TableEditor {
         }
         else {
             let cell = this.mSchedule.getElementDetails(<HTMLElement>e.target);
-            if (e.button == 0) {
-                this.mSchedule.selection_click(cell.id, true)
+            if (e.button == 0 && cell.id.isValid) {
+                this.cellEditor_store();
+                this.cellEditor_move(<HTMLElement>e.target, cell.data.value.toString());
+                this.mSchedule.selection_click(cell.id, true);
                 this.mSelecting = true;
-                this.mFloat.show(<HTMLElement>e.target, cell.data.value.toString());
-                this.setCellEdit(false);
             } else {
                 this.mSelecting = false;
             }
