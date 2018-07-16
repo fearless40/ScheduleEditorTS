@@ -185,9 +185,3 @@ export class Vertical implements LayoutItem{
     }
 }
 
-export class LayoutTable extends Vertical {
-        
-    constructor(autoExpand: boolean = true) {
-        super(false, autoExpand);
-    }
-}

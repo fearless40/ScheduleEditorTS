@@ -11,20 +11,21 @@ export function MaxColumns(items: Cell2d): number {
     return maxCol;
 }
 
-
-
-export const enum CellType {
-    HeaderCell,
-    BodyCell,
-    FooterCell,
-}
-
-
-export class Cell {
+export interface Cell {
     public rowspan: number
     public colspan: number
     public data: DataItem
-    public isHeader: boolean
+    public isReadOnly: boolean
+    isEmpty(): boolean 
+    public cssClasses: string[];
+}
+
+
+export class CellSimple implements Cell {
+    public rowspan: number
+    public colspan: number
+    public data: DataItem
+    public isReadOnly: boolean
 
     constructor(data: DataItem, rowspan: number = 1, colspan: number = 1) {
         this.rowspan = rowspan;
@@ -36,9 +37,10 @@ export class Cell {
         return (this.rowspan <= 0 || this.colspan <= 0);
     }
 
-    public static readonly EmptyCell = new Cell(EmptyDataItem.EmptyItem, -1, -1);
+    public static readonly EmptyCell = new CellSimple(EmptyDataItem.EmptyItem, -1, -1);
     public cssClasses: string[] = [];
 }
+
 
     
 

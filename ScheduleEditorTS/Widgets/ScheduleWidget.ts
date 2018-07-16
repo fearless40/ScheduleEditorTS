@@ -133,7 +133,6 @@ class Selection {
     }
 
     grow(rowCount: number, colCount: number): void {
-        //this.click(this.mRow_end + rowCount, this.mCol_end + colCount);
         this.mRow_end += rowCount;
         this.mCol_end += colCount;
         this.normalize();
@@ -253,10 +252,8 @@ export class ReadOnlySelection {
     }
 
     forEach(cb: ReadOnlySelectionCB) {
-        // Doing it by row as this will lead to more efficent processing for batches of data.'
-        // Most rows are made of the same owner therefore more can be batched at once
-        for (let col = this.mCol_start; col <= this.mCol_end; ++col) {
-            for (let row = this.mRow_start; row <= this.mRow_end; ++row) {
+        for (let row = this.mRow_start; row <= this.mRow_end; ++row) {
+            for (let col = this.mCol_start; col <= this.mCol_end; ++col) {
                 cb(this.parent.cell_details({ row: row, col: col }));
             }
         }
@@ -448,24 +445,10 @@ export class ScheduleWidget {
         }
     }
 
-    change(elementIds: ScheduleWidgetID[], values : string[]) : void {
-        // Fire onchange event before writing to the element
-        // If on change evnet returns no write then don't write to the element. The onchange handled it
-        // Code not implemeneted yet, therefore just write the new value into the element.
-        if( elementIds.length != values.length ) {
-            console.log("Yo done fucked up.");
-            return;
-        }
-        let that = this;
-        elementIds.forEach( (value:ScheduleWidgetID, index:number) => {
-                this.mHtmlCells[value.row][value.col].element.textContent = values[index];
-        });
-    }
-
     private onChange = (e: EventOnChange) : boolean => {
         if (!this.mOwnerToHtml.has(e.owner)) { return true;}
 
-        let oMap = this.mOwnerToHtml.get(e.owner);
+        const oMap = this.mOwnerToHtml.get(e.owner);
         let that = this;
         e.ids.forEach((value, index) => {
             if (oMap.has(value)) {
