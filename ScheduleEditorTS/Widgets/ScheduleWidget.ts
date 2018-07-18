@@ -1,6 +1,8 @@
-﻿import { LayoutTable } from "../view/TableLayout.js";
-import { DataItem, DataView, EventOnChange, DataChangedBy} from "../data/Data.js";
+﻿import { DataItem, DataView, EventOnChange, DataChangedBy} from "../data/Data.js";
 import { Datum, ReadonlyDataItem } from "../data/DataItemHelpers.js";
+import { LayoutTable } from "../layout/Table.js";
+import { MetaTypes } from "../layout/MetaData.js";
+import { TableRange } from "../layout/Helpers.js";
 
 class ColItem {
     constructor() {}
@@ -478,7 +480,7 @@ export class ScheduleWidget {
 
 
 
-    render(layout : LayoutTable): void {
+    /*render(layout : LayoutTable): void {
         // Emtpy the existing data structures
         this.clear_internals();
 
@@ -527,5 +529,106 @@ export class ScheduleWidget {
 
         // Currently a quick hack should make it ignore the header cells
         this.mCurrentSelection = new Selection(2, this.mHtmlCells.length - 1, 2, this.mHtmlCells[0].length-1);
+    }*/
+
+    render(layout: LayoutTable): void {
+        // Emtpy the existing data structures
+
+
+        function create_columns_descriptors(parent: HTMLElement, nbrColumns: number): HTMLElement[] {
+            let colGroup = document.createElement("colgroup");
+            let retArray= new Array<HTMLElement>(nbrColumns);
+
+            for (let i = 0; i < nbrColumns; ++i) {
+                let colItem: HTMLElement = document.createElement("col");
+                colGroup.appendChild(colItem);
+                retArray[i] = colItem;
+            }
+            parent.appendChild(colGroup);
+            return retArray;
+        }
+
+        function build_storage(row_length: number, col_length: number): Array<Array<HtmlCell>> {
+            let HtmlCells = new Array<Array<HtmlCell>>(row_length);
+            for (let rowIndex = 0; rowIndex < col_length; ++rowIndex) {
+                HtmlCells[rowIndex] = new Array<HtmlCell>(col_length);
+            }
+            return HtmlCells;
+        }
+
+
+        this.clear_internals();
+
+        let fragment = document.createDocumentFragment();
+        let table = document.createElement("table");
+        fragment.appendChild(table);
+        let grid = layout.toGrid();
+        let range_left = new TableRange(0, 0, grid.length-1, grid[0].length-1);
+
+        
+        //let col_meta = layout.metaData_get(MetaTypes.Columns);
+
+        this.mHtmlCells = build_storage(grid.length, grid[0].length);
+        
+        //Generate the header meta element
+        if (layout.metaData_exists(MetaTypes.Header)) {
+            const tHead = document.createElement("thead");
+            // Only grab the first header item. Others are ignored
+            const tMeta = layout.metaData_get(MetaTypes.Header)[0];
+
+            // Make a new range as the header type meta element applies to rows (the first rows)
+            this.render_cells(tHead, new TableRange(tMeta.range.row_start, tMeta.range.row_end, range_left.col_start, range_left.col_end));
+            range_left.row_start = tMeta.range.row_end + 1;
+            table.appendChild(tHead);
+        }
+
+        //Ignore the footer for now
+
+        //Render the body
+        {
+            const body = document.createElement("tbody");
+            this.render_cells(body, range_left);
+        }
+        
+        this.mParentElement.appendChild(fragment);
+        this.mRoot = <HTMLElement>this.mParentElement.lastChild;
+        grid = null;
+
+        // Currently a quick hack should make it ignore the header cells
+        this.mCurrentSelection = new Selection(2, this.mHtmlCells.length - 1, 2, this.mHtmlCells[0].length - 1);
+    }
+
+    private render_cells(parent: HTMLElement, range: TableRange): void {
+    for (let rowIndex = range.row_start; rowIndex <= range.row_end; ++rowIndex) {
+        let tr = document.createElement("tr");
+        const row = grid[rowIndex];
+
+        for (let colIndex = range.col_start; colIndex <= range.col_end; ++colIndex) {
+            const cell = row[colIndex];
+            if (!cell.isEmpty()) {
+                let tdType: string = cell.isReadOnly ? "th" : "td";
+                let td = document.createElement(tdType);
+
+                // Update the internal mapping
+                let htmlCell = new HtmlCell(td, cell.data);
+                this.register_owner(cell.data.owner).set(cell.data.id, htmlCell); //Could be made more efficent with cacheing
+                this.mHtmlCells[rowIndex][colIndex] = htmlCell;
+                // End internal mappings
+
+                if (cell.rowspan > 1)
+                    td.setAttribute(SWAttributes.Rowspan, cell.rowspan.toString());
+                if (cell.colspan > 1)
+                    td.setAttribute(SWAttributes.Colspan, cell.colspan.toString());
+                if (cell.cssClasses.length > 0) {
+                    cell.cssClasses.forEach((value: string) => { td.classList.add(value) });
+                }
+
+                td.textContent = cell.data.value.toString();
+                this.configureElement(td, rowIndex, colIndex);
+                tr.appendChild(td);
+            }
+        }
+
+        parent.appendChild(tr);
     }
 }

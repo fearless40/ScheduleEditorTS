@@ -101,7 +101,7 @@
     <TypeScriptCompile Include="util\EventSimple.ts" />
     <TypeScriptCompile Include="layout\Painter.ts" />
     <TypeScriptCompile Include="layout\Table.ts" />
-    <TypeScriptCompile Include="layout\PseudoClass.ts" />
+    <TypeScriptCompile Include="layout\MetaData.ts" />
     <TypeScriptCompile Include="widgets\FloatingTextInput.ts" />
     <TypeScriptCompile Include="widgets\ScheduleWidget.ts" />
     <TypeScriptCompile Include="data\Data.ts" />

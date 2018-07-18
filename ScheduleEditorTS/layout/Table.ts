@@ -1,29 +1,36 @@
 ﻿import * as Layout from "./Layout.js"
-import {PseudoTypes, PseudoLayout, SearchForPseudoElements } from "./PseudoClass.js"
+import {MetaTypes, MetaLayout, SearchForPseudoElements } from "./MetaData.js"
 import {TableRange} from "./Helpers.js"
 import { Cell2d } from "./Cell.js";
 
 
 export class LayoutTable extends Layout.Vertical {
-    private pElements : Set<PseudoLayout>;
+    private meta : Set<MetaLayout>;
 
 
     constructor(autoExpand: boolean = true) {
         super(false, autoExpand);
     }
 
-    pseudoElement_has(): boolean {
-        return this.pElements.size > 0;
-    }
-
-    pseudoElement_get(type: PseudoTypes): TableRange {
-        const values = this.pElements.values();
+    metaData_exists(type: MetaTypes): boolean {
+        const values = this.meta.values();
         for (let v of values) {
             if (v.type == type) {
-                return v.range;
+                return true;
             }
         }
-        return new TableRange(-1, -1, -1, -1);
+        return false;
+    }
+
+    metaData_get(type: MetaTypes): MetaLayout[] {
+        let meta_array = new Array<MetaLayout>();
+        const values = this.meta.values();
+        for (let v of values) {
+            if (v.type == type) {
+                meta_array.push(v);
+            }
+        }
+        return meta_array;
     }
 
     toGrid(): Cell2d {

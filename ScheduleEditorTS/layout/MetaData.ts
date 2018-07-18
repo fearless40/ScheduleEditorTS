@@ -4,13 +4,14 @@ import {DataItem} from "../data/Data.js"
 import {Cell2d, Cell, CellSimple} from "./Cell.js"
 import { TableRange } from "./Helpers.js";
 
-export const enum PseudoTypes {
+export const enum MetaTypes {
     Header,
     Body,
     Footer,
     Columns,
     Rows,
-    Caption
+    Caption,
+    RowHeader
 }
 
 const enum Markers {
@@ -18,14 +19,14 @@ const enum Markers {
     End
 }
 
-export interface PseudoLayout extends LayoutItem {
+export interface MetaLayout extends LayoutItem {
     toGrid(): Cell2d;
     range: TableRange;
-    type: PseudoTypes;
+    type: MetaTypes;
 }
 
-export function SearchForPseudoElements(values: Cell2d) : Set<PseudoLayout> {
-    let ret = new Set<PseudoLayout>();
+export function SearchForPseudoElements(values: Cell2d) : Set<MetaLayout> {
+    let ret = new Set<MetaLayout>();
     for (let row = 0; row < values.length; ++row) {
         for (let col = 0; col < values[0].length; ++col) {
             let c = values[row][col];
@@ -49,7 +50,7 @@ export function SearchForPseudoElements(values: Cell2d) : Set<PseudoLayout> {
 
 interface MarkInstance {
     position: Markers,
-    owner: PseudoLayout
+    owner: MetaLayout
 }
 
 class CellMarked implements Cell {
@@ -58,7 +59,7 @@ class CellMarked implements Cell {
     public data: DataItem
     public isReadOnly: boolean
 
-    constructor(cell: CellSimple | CellMarked, markerPosition: Markers, markOwner: PseudoLayout) {
+    constructor(cell: CellSimple | CellMarked, markerPosition: Markers, markOwner: MetaLayout) {
         this.rowspan = cell.rowspan;
         this.colspan = cell.colspan;
         this.data = cell.data;
@@ -80,7 +81,7 @@ class CellMarked implements Cell {
 
 
 
-function pseudoMarkerHelper(item : LayoutItem, layout: PseudoLayout) : Cell2d{
+function pseudoMarkerHelper(item : LayoutItem, layout: MetaLayout) : Cell2d{
     const values = item.toGrid();
     values[0][0] = new CellMarked(values[0][0], Markers.Start, layout);
 
@@ -92,14 +93,14 @@ function pseudoMarkerHelper(item : LayoutItem, layout: PseudoLayout) : Cell2d{
     return values;
 }
 
-class HeaderFooterBody implements PseudoLayout {
+class HeaderFooterBody implements MetaLayout {
     range: TableRange = new TableRange(-1, -1, -1, -1);
 
-    constructor(private item: LayoutItem, readonly layoutType: PseudoTypes) {
+    constructor(private item: LayoutItem, readonly layoutType: MetaTypes) {
 
     }
 
-    get type() : PseudoTypes {
+    get type() : MetaTypes {
         return this.layoutType;
     }
 
@@ -108,7 +109,7 @@ class HeaderFooterBody implements PseudoLayout {
     }
 }
 
-class ColumnPainter implements PseudoLayout {
+class ColumnPainter implements MetaLayout {
 
     constructor(private item: LayoutItem, public cssClass: string) {
 
@@ -118,8 +119,8 @@ class ColumnPainter implements PseudoLayout {
 
 
 
-    get type(): PseudoTypes {
-        return PseudoTypes.Columns;
+    get type(): MetaTypes {
+        return MetaTypes.Columns;
     }
 
     toGrid(): Cell2d {
