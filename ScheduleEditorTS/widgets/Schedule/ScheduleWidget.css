@@ -18,6 +18,15 @@
         overflow: hidden;
     }
 
+.schedule-weekend-fmt {
+    background-color: rgb(255, 122, 122);
+}
+
+.schedule-holiday-fmt {
+    background-color: forestgreen;
+}
+
+
 .schedule-select {
     background-color: lightblue;
 }

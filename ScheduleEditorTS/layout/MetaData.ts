@@ -67,8 +67,12 @@ class CellMarked implements Cell {
         this.cssClasses = cell.cssClasses;
 
         if (cell instanceof CellMarked) {
-            this.marks.push({ position: markerPosition, owner: markOwner });
+            this.marks = cell.marks;
         }
+        else {
+            this.marks = [];
+        }
+        this.marks.push({ position: markerPosition, owner: markOwner });
     }
 
     isEmpty(): boolean {
@@ -76,7 +80,7 @@ class CellMarked implements Cell {
     }
 
     public cssClasses: string[] = [];
-    public marks: MarkInstance[] = [];
+    public marks: MarkInstance[];
 }
 
 
@@ -93,7 +97,7 @@ function pseudoMarkerHelper(item : LayoutItem, layout: MetaLayout) : Cell2d{
     return values;
 }
 
-class HeaderFooterBody implements MetaLayout {
+export class MetaItem implements MetaLayout {
     range: TableRange = new TableRange(-1, -1, -1, -1);
 
     constructor(private item: LayoutItem, readonly layoutType: MetaTypes) {
@@ -109,21 +113,10 @@ class HeaderFooterBody implements MetaLayout {
     }
 }
 
-class ColumnPainter implements MetaLayout {
+class ColumnPainter extends MetaItem  {
 
-    constructor(private item: LayoutItem, public cssClass: string) {
-
+    constructor(item: LayoutItem) {
+        super(item, MetaTypes.Columns);
     }
 
-    range: TableRange = new TableRange(-1, -1, -1, -1);
-
-
-
-    get type(): MetaTypes {
-        return MetaTypes.Columns;
-    }
-
-    toGrid(): Cell2d {
-        return pseudoMarkerHelper(this.item, this);
-    }
 }

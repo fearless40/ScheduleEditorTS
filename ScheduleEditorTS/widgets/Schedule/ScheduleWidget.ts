@@ -3,6 +3,8 @@ import { Datum, ReadonlyDataItem } from "../data/DataItemHelpers.js";
 import { LayoutTable } from "../layout/Table.js";
 import { MetaTypes } from "../layout/MetaData.js";
 import { TableRange } from "../layout/Helpers.js";
+import { Cell2d } from "../layout/Cell.js";
+import { LayoutTable } from "../../layout/Table.js";
 
 class ColItem {
     constructor() {}
@@ -270,15 +272,16 @@ export class ReadOnlySelection {
 }
     
 export class ScheduleWidget {
-    
-    
+
+
     private mParentElement: Node
-    private mIDPrefix : string
+    private mIDPrefix: string
     private mHtmlCells: HTMLCells;
     private mRoot: HTMLElement;
     private mOwnerToHtml: OwnerToCellMap;
     private mCurrentSelection: Selection;
-    
+    private mHtmlCol: HTMLElement[];
+
 
     constructor(parent: Node) {
         this.mParentElement = parent;
@@ -286,21 +289,21 @@ export class ScheduleWidget {
         this.mOwnerToHtml = new Map<DataView, NumberToCell>();
     }
 
-    private makeIDForCell(rowIndex:number, colIndex:number) : string {
-         if( colIndex < 0 ) {
+    private makeIDForCell(rowIndex: number, colIndex: number): string {
+        if (colIndex < 0) {
             return this.mIDPrefix + "_" + rowIndex.toString();
-        }       
+        }
 
-         return this.mIDPrefix + "_" + rowIndex.toString() + "_" + colIndex.toString();
+        return this.mIDPrefix + "_" + rowIndex.toString() + "_" + colIndex.toString();
     }
 
-    private configureElement(element: HTMLElement , rowIndex : number, colIndex : number) {
+    private configureElement(element: HTMLElement, rowIndex: number, colIndex: number) {
         element.id = this.makeIDForCell(rowIndex, colIndex);
         element.setAttribute(SWAttributes.RowIndex, rowIndex.toString());
         element.setAttribute(SWAttributes.ColIndex, colIndex.toString());
     }
-    
-    get root() : HTMLElement {
+
+    get root(): HTMLElement {
         return this.mRoot;
     }
 
@@ -367,7 +370,7 @@ export class ScheduleWidget {
         this.mCurrentSelection.clear();
     }
 
-    selection_click(id: ScheduleWidgetID, newClick:boolean) {
+    selection_click(id: ScheduleWidgetID, newClick: boolean) {
         if (!this.isIDValid(id)) { return; }
         this.selection_render_clear(this.mCurrentSelection);
         if (newClick) {
@@ -413,23 +416,23 @@ export class ScheduleWidget {
     }
 
     getElementID(element: HTMLElement): ScheduleCellID {
-       /* let row = -1, col = -1;
-        switch (element.tagName) {
-            case "TH":
-            case "TD":
-                let td = <HTMLTableCellElement>element;
-                col = td.cellIndex;
-                row = (<HTMLTableRowElement>td.parentElement).rowIndex;
-                break;
-            case "TR":
-                break;
-        }
-
-        console.log(row == parseInt(element.getAttribute(SWAttributes.RowIndex)));
-        console.log(col == parseInt(element.getAttribute(SWAttributes.ColIndex)));
-        */
+        /* let row = -1, col = -1;
+         switch (element.tagName) {
+             case "TH":
+             case "TD":
+                 let td = <HTMLTableCellElement>element;
+                 col = td.cellIndex;
+                 row = (<HTMLTableRowElement>td.parentElement).rowIndex;
+                 break;
+             case "TR":
+                 break;
+         }
+ 
+         console.log(row == parseInt(element.getAttribute(SWAttributes.RowIndex)));
+         console.log(col == parseInt(element.getAttribute(SWAttributes.ColIndex)));
+         */
         return new ScheduleCellID(parseInt(element.getAttribute(SWAttributes.RowIndex)),
-                                  parseInt(element.getAttribute(SWAttributes.ColIndex)));
+            parseInt(element.getAttribute(SWAttributes.ColIndex)));
     }
 
 
@@ -447,8 +450,8 @@ export class ScheduleWidget {
         }
     }
 
-    private onChange = (e: EventOnChange) : boolean => {
-        if (!this.mOwnerToHtml.has(e.owner)) { return true;}
+    private onChange = (e: EventOnChange): boolean => {
+        if (!this.mOwnerToHtml.has(e.owner)) { return true; }
 
         const oMap = this.mOwnerToHtml.get(e.owner);
         let that = this;
@@ -537,7 +540,7 @@ export class ScheduleWidget {
 
         function create_columns_descriptors(parent: HTMLElement, nbrColumns: number): HTMLElement[] {
             let colGroup = document.createElement("colgroup");
-            let retArray= new Array<HTMLElement>(nbrColumns);
+            let retArray = new Array<HTMLElement>(nbrColumns);
 
             for (let i = 0; i < nbrColumns; ++i) {
                 let colItem: HTMLElement = document.createElement("col");
@@ -563,13 +566,14 @@ export class ScheduleWidget {
         let table = document.createElement("table");
         fragment.appendChild(table);
         let grid = layout.toGrid();
-        let range_left = new TableRange(0, 0, grid.length-1, grid[0].length-1);
+        let range_left = new TableRange(0, grid.length - 1,0, grid[0].length - 1);
 
-        
+
         //let col_meta = layout.metaData_get(MetaTypes.Columns);
 
         this.mHtmlCells = build_storage(grid.length, grid[0].length);
-        
+        this.mHtmlCol = create_columns_descriptors(table, range_left.col_end);
+
         //Generate the header meta element
         if (layout.metaData_exists(MetaTypes.Header)) {
             const tHead = document.createElement("thead");
@@ -577,7 +581,7 @@ export class ScheduleWidget {
             const tMeta = layout.metaData_get(MetaTypes.Header)[0];
 
             // Make a new range as the header type meta element applies to rows (the first rows)
-            this.render_cells(tHead, new TableRange(tMeta.range.row_start, tMeta.range.row_end, range_left.col_start, range_left.col_end));
+            this.render_cells(tHead, new TableRange(tMeta.range.row_start, tMeta.range.row_end, range_left.col_start, range_left.col_end), grid);
             range_left.row_start = tMeta.range.row_end + 1;
             table.appendChild(tHead);
         }
@@ -587,48 +591,66 @@ export class ScheduleWidget {
         //Render the body
         {
             const body = document.createElement("tbody");
-            this.render_cells(body, range_left);
+            this.render_cells(body, range_left, grid);
+            table.appendChild(body);
+        }
+
+        // Set the allowed selection amount based off RowHeader meta data
+        if (layout.metaData_exists(MetaTypes.RowHeader)) {
+            const rowheader = layout.metaData_get(MetaTypes.RowHeader)[0];
+            this.mCurrentSelection = new Selection(range_left.row_start, range_left.row_end,
+                                                   rowheader.range.col_end + 1, range_left.col_end);
+        } else {
+            // Defaults to the first row as the header.
+            this.mCurrentSelection = new Selection(range_left.row_start, range_left.row_end,
+                                                   1, range_left.col_end);
         }
         
+        render_painters(layout)
+
         this.mParentElement.appendChild(fragment);
         this.mRoot = <HTMLElement>this.mParentElement.lastChild;
         grid = null;
-
-        // Currently a quick hack should make it ignore the header cells
-        this.mCurrentSelection = new Selection(2, this.mHtmlCells.length - 1, 2, this.mHtmlCells[0].length - 1);
     }
 
-    private render_cells(parent: HTMLElement, range: TableRange): void {
-    for (let rowIndex = range.row_start; rowIndex <= range.row_end; ++rowIndex) {
-        let tr = document.createElement("tr");
-        const row = grid[rowIndex];
+    private render_cells(parent: HTMLElement, range: TableRange, grid: Cell2d): void {
+        for (let rowIndex = range.row_start; rowIndex <= range.row_end; ++rowIndex) {
+            let tr = document.createElement("tr");
+            const row = grid[rowIndex];
 
-        for (let colIndex = range.col_start; colIndex <= range.col_end; ++colIndex) {
-            const cell = row[colIndex];
-            if (!cell.isEmpty()) {
-                let tdType: string = cell.isReadOnly ? "th" : "td";
-                let td = document.createElement(tdType);
+            for (let colIndex = range.col_start; colIndex <= range.col_end; ++colIndex) {
+                const cell = row[colIndex];
+                if (!cell.isEmpty()) {
+                    let tdType: string = cell.isReadOnly ? "th" : "td";
+                    let td = document.createElement(tdType);
 
-                // Update the internal mapping
-                let htmlCell = new HtmlCell(td, cell.data);
-                this.register_owner(cell.data.owner).set(cell.data.id, htmlCell); //Could be made more efficent with cacheing
-                this.mHtmlCells[rowIndex][colIndex] = htmlCell;
-                // End internal mappings
+                    // Update the internal mapping
+                    let htmlCell = new HtmlCell(td, cell.data);
+                    this.register_owner(cell.data.owner).set(cell.data.id, htmlCell); //Could be made more efficent with cacheing
+                    this.mHtmlCells[rowIndex][colIndex] = htmlCell;
+                    // End internal mappings
 
-                if (cell.rowspan > 1)
-                    td.setAttribute(SWAttributes.Rowspan, cell.rowspan.toString());
-                if (cell.colspan > 1)
-                    td.setAttribute(SWAttributes.Colspan, cell.colspan.toString());
-                if (cell.cssClasses.length > 0) {
-                    cell.cssClasses.forEach((value: string) => { td.classList.add(value) });
+                    if (cell.rowspan > 1)
+                        td.setAttribute(SWAttributes.Rowspan, cell.rowspan.toString());
+                    if (cell.colspan > 1)
+                        td.setAttribute(SWAttributes.Colspan, cell.colspan.toString());
+                    if (cell.cssClasses.length > 0) {
+                        cell.cssClasses.forEach((value: string) => { td.classList.add(value) });
+                    }
+
+                    td.textContent = cell.data.value.toString();
+                    this.configureElement(td, rowIndex, colIndex);
+                    tr.appendChild(td);
                 }
-
-                td.textContent = cell.data.value.toString();
-                this.configureElement(td, rowIndex, colIndex);
-                tr.appendChild(td);
             }
-        }
 
-        parent.appendChild(tr);
+            parent.appendChild(tr);
+        }
+    }
+
+    private render_painters(layout: LayoutTable): void {
+        if (layout.metaData_exists(MetaTypes.Columns)) {
+
+        }
     }
 }

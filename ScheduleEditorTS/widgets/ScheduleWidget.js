@@ -1,4 +1,5 @@
 import { Datum, ReadonlyDataItem } from "../data/DataItemHelpers.js";
+import { TableRange } from "../layout/Helpers.js";
 class ColItem {
     constructor() {
         this.value = "";
@@ -78,7 +79,6 @@ class Selection {
         this.normalize();
     }
     grow(rowCount, colCount) {
-        //this.click(this.mRow_end + rowCount, this.mCol_end + colCount);
         this.mRow_end += rowCount;
         this.mCol_end += colCount;
         this.normalize();
@@ -221,10 +221,8 @@ export class ReadOnlySelection {
         return (this.mRow_start == this.mRow_start && this.mCol_end == this.mCol_start);
     }
     forEach(cb) {
-        // Doing it by row as this will lead to more efficent processing for batches of data.'
-        // Most rows are made of the same owner therefore more can be batched at once
-        for (let col = this.mCol_start; col <= this.mCol_end; ++col) {
-            for (let row = this.mRow_start; row <= this.mRow_end; ++row) {
+        for (let row = this.mRow_start; row <= this.mRow_end; ++row) {
+            for (let col = this.mCol_start; col <= this.mCol_end; ++col) {
                 cb(this.parent.cell_details({ row: row, col: col }));
             }
         }
@@ -241,7 +239,7 @@ export class ScheduleWidget {
             if (!this.mOwnerToHtml.has(e.owner)) {
                 return true;
             }
-            let oMap = this.mOwnerToHtml.get(e.owner);
+            const oMap = this.mOwnerToHtml.get(e.owner);
             let that = this;
             e.ids.forEach((value, index) => {
                 if (oMap.has(value)) {
@@ -383,19 +381,6 @@ export class ScheduleWidget {
             return null;
         }
     }
-    change(elementIds, values) {
-        // Fire onchange event before writing to the element
-        // If on change evnet returns no write then don't write to the element. The onchange handled it
-        // Code not implemeneted yet, therefore just write the new value into the element.
-        if (elementIds.length != values.length) {
-            console.log("Yo done fucked up.");
-            return;
-        }
-        let that = this;
-        elementIds.forEach((value, index) => {
-            this.mHtmlCells[value.row][value.col].element.textContent = values[index];
-        });
-    }
     register_owner(owner) {
         if (this.mOwnerToHtml.has(owner) == false) {
             let newMap = new Map();
@@ -412,22 +397,124 @@ export class ScheduleWidget {
         this.mOwnerToHtml = new Map();
         this.mHtmlCells = null;
     }
+    /*render(layout : LayoutTable): void {
+        // Emtpy the existing data structures
+        this.clear_internals();
+
+        let fragment = document.createDocumentFragment();
+        let table = document.createElement("table");
+        fragment.appendChild(table);
+        let grid = layout.toGrid();
+
+        this.mHtmlCells = new Array<Array<HtmlCell>>(grid.length);
+        for (let rowIndex = 0; rowIndex < grid.length; ++rowIndex) {
+            let tr = document.createElement("tr");
+            let row = grid[rowIndex];
+        
+            this.mHtmlCells[rowIndex] = new Array<HtmlCell>(row.length);
+            for (let colIndex = 0; colIndex < row.length; ++colIndex) {
+                let cell = row[colIndex];
+                if (!cell.isEmpty()) {
+                    let tdType : string = cell.isHeader ? "th" : "td";
+                    let td = document.createElement(tdType);
+  
+                    // Update the internal mapping
+                    let htmlCell = new HtmlCell(td, cell.data);
+                    this.register_owner(cell.data.owner).set(cell.data.id, htmlCell); //Could be made more efficent with cacheing
+                    this.mHtmlCells[rowIndex][colIndex] = htmlCell;
+                    // End internal mappings
+                    
+                    if (cell.rowspan > 1)
+                        td.setAttribute(SWAttributes.Rowspan, cell.rowspan.toString());
+                    if (cell.colspan > 1)
+                        td.setAttribute(SWAttributes.Colspan, cell.colspan.toString());
+                    if (cell.cssClasses.length > 0) {
+                        cell.cssClasses.forEach((value: string) => { td.classList.add(value) });
+                    }
+                    
+                    td.textContent = cell.data.value.toString();
+                    this.configureElement(td, rowIndex, colIndex);
+                    tr.appendChild(td);
+                }
+            }
+
+            table.appendChild(tr);
+        }
+        this.mParentElement.appendChild(fragment);
+        this.mRoot = <HTMLElement> this.mParentElement.lastChild;
+        grid = null;
+
+        // Currently a quick hack should make it ignore the header cells
+        this.mCurrentSelection = new Selection(2, this.mHtmlCells.length - 1, 2, this.mHtmlCells[0].length-1);
+    }*/
     render(layout) {
         // Emtpy the existing data structures
+        function create_columns_descriptors(parent, nbrColumns) {
+            let colGroup = document.createElement("colgroup");
+            let retArray = new Array(nbrColumns);
+            for (let i = 0; i < nbrColumns; ++i) {
+                let colItem = document.createElement("col");
+                colGroup.appendChild(colItem);
+                retArray[i] = colItem;
+            }
+            parent.appendChild(colGroup);
+            return retArray;
+        }
+        function build_storage(row_length, col_length) {
+            let HtmlCells = new Array(row_length);
+            for (let rowIndex = 0; rowIndex < col_length; ++rowIndex) {
+                HtmlCells[rowIndex] = new Array(col_length);
+            }
+            return HtmlCells;
+        }
         this.clear_internals();
         let fragment = document.createDocumentFragment();
         let table = document.createElement("table");
         fragment.appendChild(table);
         let grid = layout.toGrid();
-        this.mHtmlCells = new Array(grid.length);
-        for (let rowIndex = 0; rowIndex < grid.length; ++rowIndex) {
+        let range_left = new TableRange(0, grid.length - 1, 0, grid[0].length - 1);
+        //let col_meta = layout.metaData_get(MetaTypes.Columns);
+        this.mHtmlCells = build_storage(grid.length, grid[0].length);
+        //Generate the header meta element
+        if (layout.metaData_exists(0 /* Header */)) {
+            const tHead = document.createElement("thead");
+            // Only grab the first header item. Others are ignored
+            const tMeta = layout.metaData_get(0 /* Header */)[0];
+            // Make a new range as the header type meta element applies to rows (the first rows)
+            this.render_cells(tHead, new TableRange(tMeta.range.row_start, tMeta.range.row_end, range_left.col_start, range_left.col_end), grid);
+            range_left.row_start = tMeta.range.row_end + 1;
+            table.appendChild(tHead);
+        }
+        //Ignore the footer for now
+        //Render the body
+        {
+            const body = document.createElement("tbody");
+            this.render_cells(body, range_left, grid);
+            table.appendChild(body);
+        }
+        // Set the allowed selection amount
+        if (layout.metaData_exists(6 /* RowHeader */)) {
+            const rowheader = layout.metaData_get(6 /* RowHeader */)[0];
+            this.mCurrentSelection = new Selection(range_left.row_start, range_left.row_end, rowheader.range.col_end + 1, range_left.col_end);
+        }
+        else {
+            // Defaults to the first row as the header.
+            this.mCurrentSelection = new Selection(range_left.row_start, range_left.row_end, 1, range_left.col_end);
+        }
+        this.mParentElement.appendChild(fragment);
+        this.mRoot = this.mParentElement.lastChild;
+        grid = null;
+        // Currently a quick hack should make it ignore the header cells
+        //this.mCurrentSelection = new Selection(2, this.mHtmlCells.length - 1, 2, this.mHtmlCells[0].length - 1);
+    }
+    render_cells(parent, range, grid) {
+        for (let rowIndex = range.row_start; rowIndex <= range.row_end; ++rowIndex) {
             let tr = document.createElement("tr");
-            let row = grid[rowIndex];
-            this.mHtmlCells[rowIndex] = new Array(row.length);
-            for (let colIndex = 0; colIndex < row.length; ++colIndex) {
-                let cell = row[colIndex];
+            const row = grid[rowIndex];
+            for (let colIndex = range.col_start; colIndex <= range.col_end; ++colIndex) {
+                const cell = row[colIndex];
                 if (!cell.isEmpty()) {
-                    let tdType = cell.isHeader ? "th" : "td";
+                    let tdType = cell.isReadOnly ? "th" : "td";
                     let td = document.createElement(tdType);
                     // Update the internal mapping
                     let htmlCell = new HtmlCell(td, cell.data);
@@ -446,13 +533,8 @@ export class ScheduleWidget {
                     tr.appendChild(td);
                 }
             }
-            table.appendChild(tr);
+            parent.appendChild(tr);
         }
-        this.mParentElement.appendChild(fragment);
-        this.mRoot = this.mParentElement.lastChild;
-        grid = null;
-        // Currently a quick hack should make it ignore the header cells
-        this.mCurrentSelection = new Selection(2, this.mHtmlCells.length - 1, 2, this.mHtmlCells[0].length - 1);
     }
 }
 //# sourceMappingURL=ScheduleWidget.js.map

@@ -6,7 +6,7 @@ export function MaxColumns(items) {
     }
     return maxCol;
 }
-export class Cell {
+export class CellSimple {
     constructor(data, rowspan = 1, colspan = 1) {
         this.cssClasses = [];
         this.rowspan = rowspan;
@@ -17,5 +17,5 @@ export class Cell {
         return (this.rowspan <= 0 || this.colspan <= 0);
     }
 }
-Cell.EmptyCell = new Cell(EmptyDataItem.EmptyItem, -1, -1);
+CellSimple.EmptyCell = new CellSimple(EmptyDataItem.EmptyItem, -1, -1);
 //# sourceMappingURL=Cell.js.map

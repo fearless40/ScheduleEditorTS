@@ -1,7 +1,7 @@
-﻿import {ScheduleWidget, ScheduleWidgetID, ScheduleCellID, ScheduleWidgetCellInfo, ReadOnlySelection, ReadOnlySelectionCB} from "../widgets/ScheduleWidget.js";
-import { LayoutTable } from "../view/TableLayout.js"
+﻿import {ScheduleWidget, ScheduleWidgetID, ScheduleCellID, ScheduleWidgetCellInfo, ReadOnlySelection, ReadOnlySelectionCB} from "../widgets/Schedule/ScheduleWidget.js";
+import { LayoutTable } from "../layout/Table.js"
 import { FloatingTextInput } from "../widgets/FloatingTextInput.js";
-import { Cell } from "../view/Cell.js";
+import { Cell } from "../layout/Cell.js";
 import { DataView, DataValue } from "../data/Data.js";
 
 export class TableEditor {

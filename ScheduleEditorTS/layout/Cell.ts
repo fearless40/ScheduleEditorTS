@@ -12,12 +12,12 @@ export function MaxColumns(items: Cell2d): number {
 }
 
 export interface Cell {
-    public rowspan: number
-    public colspan: number
-    public data: DataItem
-    public isReadOnly: boolean
+    rowspan: number
+    colspan: number
+    data: DataItem
+    isReadOnly: boolean
     isEmpty(): boolean 
-    public cssClasses: string[];
+    cssClasses: string[];
 }
 
 

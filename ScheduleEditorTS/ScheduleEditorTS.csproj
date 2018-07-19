@@ -87,7 +87,7 @@
     <Content Include="HtmlPage.html" />
     <Content Include="index.html" />
     <Content Include="Web.config" />
-    <Content Include="widgets\ScheduleWidget.css" />
+    <Content Include="widgets\Schedule\ScheduleWidget.css" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="controllers\TableEditor.ts" />
@@ -98,12 +98,14 @@
     <TypeScriptCompile Include="data\ScheduleData.ts" />
     <TypeScriptCompile Include="layout\Helpers.ts" />
     <TypeScriptCompile Include="main.ts" />
+    <TypeScriptCompile Include="util\DateHelper.ts" />
     <TypeScriptCompile Include="util\EventSimple.ts" />
-    <TypeScriptCompile Include="layout\Painter.ts" />
+    <TypeScriptCompile Include="widgets\Schedule\Painter.ts" />
     <TypeScriptCompile Include="layout\Table.ts" />
     <TypeScriptCompile Include="layout\MetaData.ts" />
     <TypeScriptCompile Include="widgets\FloatingTextInput.ts" />
-    <TypeScriptCompile Include="widgets\ScheduleWidget.ts" />
+    <TypeScriptCompile Include="widgets\Schedule\ColumnPainter.ts" />
+    <TypeScriptCompile Include="widgets\Schedule\ScheduleWidget.ts" />
     <TypeScriptCompile Include="data\Data.ts" />
     <TypeScriptCompile Include="layout\Cell.ts" />
     <TypeScriptCompile Include="layout\Layout.ts" />
