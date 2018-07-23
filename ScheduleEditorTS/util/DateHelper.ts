@@ -1,8 +1,10 @@
 ﻿
 export class MonthHelper {
 
-    constructor(public month: number, public year: number) {
+    public month : number
 
+    constructor(month: number, public year: number) {
+        this.month = month - 1;
     }
 
     get month_normal(): number {

@@ -36,8 +36,8 @@ function main() : void {
 
     let month_days_vert = new Lt.Vertical(true, true);
     month_days_vert.borderBetweenDivisions = false;
-
     header_layout.addLayout(month_days_vert);
+
     month_days_vert.addLayout(new ColumnPainter(new MonthDaysLabels(5, 2018, MonthDaysFormat.ShortText), (element, info) => {
         if (info.value == "S") {
             element.classList.add("schedule-weekend-fmt");

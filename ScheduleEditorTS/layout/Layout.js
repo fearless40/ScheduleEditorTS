@@ -4,8 +4,7 @@ export class Wrapper {
         this.mDataTable = mDataTable;
     }
     toGrid() {
-        let ret = new Array();
-        ret.length = this.mDataTable.maxCountRows();
+        let ret = new Array(this.mDataTable.maxCountRows());
         for (let i = 0; i < this.mDataTable.maxCountRows(); ++i) {
             let row = this.mDataTable.getRow(i);
             ret[i] = row.map(function (value) {
@@ -114,35 +113,39 @@ export class Vertical {
         }
     }
     toGrid() {
-        let last = this.mLayouts[0].toGrid();
-        for (let vIndex = 1; vIndex < this.mLayouts.length; ++vIndex) {
-            let nextGroup = this.mLayouts[vIndex].toGrid();
-            let maxCol = MaxColumns(nextGroup);
-            for (let row = 0; row < last.length; ++row) {
-                let lRow = last[row];
-                if (lRow.length < maxCol) {
+        let grids = new Array();
+        let max_col = 0;
+        // Figure out the max col size
+        this.mLayouts.forEach((layout) => {
+            const cells = layout.toGrid();
+            max_col = Math.max(max_col, MaxColumns(cells));
+            grids.push(cells);
+        });
+        grids.forEach((cells) => {
+            for (let row = 0; row < cells.length; ++row) {
+                let tempRow = cells[row];
+                if (tempRow.length < max_col) {
                     if (this.autoExpand) {
-                        lRow[lRow.length - 1].colspan = maxCol - lRow.length;
+                        tempRow[tempRow.length - 1].colspan = max_col - tempRow.length;
                     }
-                    this.addEmptyCols(lRow, maxCol - lRow.length);
+                    this.addEmptyCols(tempRow, max_col - tempRow.length);
                 }
             }
-            // Now Add all the rows from nextGroup to last
-            let that = this;
-            nextGroup.forEach(function (value, index) {
-                if (index == 0 && that.borderBetweenDivisions) {
-                    last[last.length - 1].forEach((value) => { value.cssClasses.push("cell-bottom-border-divison"); });
-                    value.forEach((value) => { value.cssClasses.push("cell-top-border-divison"); });
-                }
-                last.push(value);
-            });
-        }
+        });
+        // Todo: Merge the values in grid into one array
+        let ret = grids.reduce((acc, cur) => {
+            if (this.borderBetweenDivisions) {
+                acc[acc.length - 1].forEach((value) => value.cssClasses.push("cell-bottom-border-divison"));
+                cur[0].forEach((value) => value.cssClasses.push("cell-top-border-divison"));
+            }
+            return acc.concat(cur);
+        });
         if (this.isHeader) {
-            last.forEach((value) => {
+            ret.forEach((value) => {
                 value.forEach((cell) => cell.isReadOnly = true);
             });
         }
-        return last;
+        return ret;
     }
 }
 //# sourceMappingURL=Layout.js.map

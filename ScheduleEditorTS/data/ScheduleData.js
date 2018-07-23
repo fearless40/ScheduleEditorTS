@@ -49,7 +49,7 @@ export class ScheduleSlotData {
         return 4;
     }
     maxCountCols() {
-        return 32;
+        return 15;
     }
     getRow(rowIndex) {
         let ret = [];

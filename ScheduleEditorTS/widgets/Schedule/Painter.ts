@@ -1,11 +1,11 @@
 ﻿import {LayoutItem} from "../../layout/Layout.js"
-import { DataTable } from "../../data/Data.js";
+import { DataView } from "../../data/Data.js";
 
 export interface PaintInformation {
     value: string
     row: number
     col: number
-    owner: DataTable
+    owner: DataView
     id: number
 }
 
@@ -14,6 +14,6 @@ export interface PainterCallback {
 }
 
 export interface Painter {
-    paint: PainterCallBack;
+    paint: PainterCallback;
 }
 

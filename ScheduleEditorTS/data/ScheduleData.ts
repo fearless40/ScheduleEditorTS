@@ -81,7 +81,7 @@ export class ScheduleSlotData implements DataTable{
     }
 
     maxCountCols(): number {
-        return 32;
+        return 15;
     }
 
     getRow(rowIndex: number): Array<DataItem> {

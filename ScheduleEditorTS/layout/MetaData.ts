@@ -85,7 +85,7 @@ class CellMarked implements Cell {
 
 
 
-function pseudoMarkerHelper(item : LayoutItem, layout: MetaLayout) : Cell2d{
+function pseudoMarkerHelper(item: LayoutItem, layout: MetaLayout): Cell2d{
     const values = item.toGrid();
     values[0][0] = new CellMarked(values[0][0], Markers.Start, layout);
 
@@ -109,14 +109,15 @@ export class MetaItem implements MetaLayout {
     }
 
     toGrid(): Cell2d {
-        return pseudoMarkerHelper(this.item, this);
+        const values = this.item.toGrid();
+        values[0][0] = new CellMarked(values[0][0], Markers.Start, this);
+
+        const lastRow = values.length - 1;
+        const lastCol = values[0].length - 1;
+
+        values[lastRow][lastCol] = new CellMarked(values[lastRow][lastCol], Markers.End, this);
+
+        return values;
+        //return pseudoMarkerHelper(this.item, this);
     }
-}
-
-class ColumnPainter extends MetaItem  {
-
-    constructor(item: LayoutItem) {
-        super(item, MetaTypes.Columns);
-    }
-
 }

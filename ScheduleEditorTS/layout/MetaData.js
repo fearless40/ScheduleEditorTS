@@ -59,20 +59,13 @@ export class MetaItem {
         return this.layoutType;
     }
     toGrid() {
-        return pseudoMarkerHelper(this.item, this);
-    }
-}
-class ColumnPainter {
-    constructor(item, cssClass) {
-        this.item = item;
-        this.cssClass = cssClass;
-        this.range = new TableRange(-1, -1, -1, -1);
-    }
-    get type() {
-        return 3 /* Columns */;
-    }
-    toGrid() {
-        return pseudoMarkerHelper(this.item, this);
+        const values = this.item.toGrid();
+        values[0][0] = new CellMarked(values[0][0], 0 /* Start */, this);
+        const lastRow = values.length - 1;
+        const lastCol = values[0].length - 1;
+        values[lastRow][lastCol] = new CellMarked(values[lastRow][lastCol], 1 /* End */, this);
+        return values;
+        //return pseudoMarkerHelper(this.item, this);
     }
 }
 //# sourceMappingURL=MetaData.js.map

@@ -1,10 +1,11 @@
 import { LayoutTable } from "./layout/Table.js";
-import { MonthLabel, MonthHeader } from "./data/MonthDataSink.js";
+import { MonthLabel, MonthDaysLabels } from "./data/MonthDataSink.js";
 import { ScheduleSlotData } from "./data/ScheduleData.js";
 import { GetSingleDataItem, LimitColumns } from "./data/DataSelectors.js";
 import { TableEditor } from "./controllers/tableeditor.js";
 import * as Lt from "./layout/Layout.js";
 import * as Meta from "./layout/MetaData.js";
+import { ColumnPainter } from "./widgets/Schedule/ColumnPainter.js";
 function main() {
     let el = document.getElementById("MainContent");
     let table_layout = new LayoutTable(true);
@@ -22,8 +23,20 @@ function main() {
     data_layout.borderBetweenDivisions = true;
     let header_layout = new Lt.Horizontal(true, true);
     let meta_header = new Meta.MetaItem(header_layout, 0 /* Header */);
-    header_layout.addDataTable(new MonthLabel());
-    header_layout.addDataTable(new MonthHeader(5, 2018));
+    header_layout.addDataTable(new MonthLabel(5));
+    let month_days_vert = new Lt.Vertical(true, true);
+    month_days_vert.borderBetweenDivisions = false;
+    header_layout.addLayout(month_days_vert);
+    month_days_vert.addLayout(new ColumnPainter(new MonthDaysLabels(5, 2018, 1 /* ShortText */), (element, info) => {
+        if (info.value == "S") {
+            element.classList.add("schedule-weekend-fmt");
+        }
+    }));
+    month_days_vert.addLayout(new ColumnPainter(new MonthDaysLabels(5, 2018, 0 /* Number */), (element, info) => {
+        if (info.value == "3") {
+            element.classList.add("schedule-holiday-fmt");
+        }
+    }));
     table_layout.addLayout(meta_header);
     table_layout.addLayout(data_layout);
     header_layout.borderBetweenDivisions = true;

@@ -1,4 +1,4 @@
-import { ScheduleWidget } from "../widgets/ScheduleWidget.js";
+import { ScheduleWidget } from "../widgets/Schedule/ScheduleWidget.js";
 import { FloatingTextInput } from "../widgets/FloatingTextInput.js";
 export class TableEditor {
     constructor(parentNode, layout) {

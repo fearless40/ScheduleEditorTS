@@ -25,7 +25,7 @@ export class MonthLabel implements DataTable{
             case 0:
                 let d = new Date();
                 d.setMonth(this.month - 1);
-                return new ReadonlyDataItem(d.toLocaleDateString("en", { month: "long", year: "numeric" });
+                return new ReadonlyDataItem(d.toLocaleDateString("en", { month: "long", year: "numeric" }));
             case 1:
                 return new ReadonlyDataItem("GRID")
         }
@@ -51,7 +51,7 @@ export class MonthDaysLabels implements DataTable {
     }
 
     maxCountCols(): number {
-        return this.monthInfo.days_count - 1;
+        return this.monthInfo.days_count ;
     }
 
     getById(id: number): DataItem {
@@ -71,8 +71,8 @@ export class MonthDaysLabels implements DataTable {
         }
 
         let ret = new Array<DataItem>(this.maxCountCols());
-        for (let i = 1; i < this.monthInfo.days_count; ++i) {
-            ret[i] = this.getById(i);
+        for (let i = 0; i < this.monthInfo.days_count; ++i) {
+            ret[i] = this.getById(i+1);
         }
         return ret;
     }
