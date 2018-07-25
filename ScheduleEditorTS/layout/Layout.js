@@ -14,6 +14,20 @@ export class Wrapper {
         return ret;
     }
 }
+function isDataTable(item) {
+    return item.getRow !== undefined;
+}
+function isLayoutItem(item) {
+    return item.toGrid !== undefined;
+}
+export function WrapperHelper(item) {
+    if (isLayoutItem(item)) {
+        return item;
+    }
+    else {
+        return new Wrapper(item);
+    }
+}
 function AddLayout(LayoutArray, item, position, specific_position) {
     switch (position) {
         case -1 /* Last */:

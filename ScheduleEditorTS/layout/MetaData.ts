@@ -14,7 +14,7 @@ export const enum MetaTypes {
     RowHeader
 }
 
-const enum Markers {
+export const enum Markers {
     Start,
     End
 }
@@ -53,7 +53,7 @@ interface MarkInstance {
     owner: MetaLayout
 }
 
-class CellMarked implements Cell {
+export class CellMarked implements Cell {
     public rowspan: number
     public colspan: number
     public data: DataItem
@@ -85,17 +85,6 @@ class CellMarked implements Cell {
 
 
 
-function pseudoMarkerHelper(item: LayoutItem, layout: MetaLayout): Cell2d{
-    const values = item.toGrid();
-    values[0][0] = new CellMarked(values[0][0], Markers.Start, layout);
-
-    const lastRow = values.length - 1;
-    const lastCol = values[0].length - 1;
-
-    values[lastRow][lastCol] = new CellMarked(values[lastRow][lastCol], Markers.End, layout);
-
-    return values;
-}
 
 export class MetaItem implements MetaLayout {
     range: TableRange = new TableRange(-1, -1, -1, -1);
@@ -118,6 +107,5 @@ export class MetaItem implements MetaLayout {
         values[lastRow][lastCol] = new CellMarked(values[lastRow][lastCol], Markers.End, this);
 
         return values;
-        //return pseudoMarkerHelper(this.item, this);
     }
 }

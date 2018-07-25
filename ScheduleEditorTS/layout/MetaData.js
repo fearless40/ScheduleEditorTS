@@ -21,7 +21,7 @@ export function SearchForPseudoElements(values) {
     }
     return ret;
 }
-class CellMarked {
+export class CellMarked {
     constructor(cell, markerPosition, markOwner) {
         this.cssClasses = [];
         this.rowspan = cell.rowspan;
@@ -41,14 +41,6 @@ class CellMarked {
         return (this.rowspan <= 0 || this.colspan <= 0);
     }
 }
-function pseudoMarkerHelper(item, layout) {
-    const values = item.toGrid();
-    values[0][0] = new CellMarked(values[0][0], 0 /* Start */, layout);
-    const lastRow = values.length - 1;
-    const lastCol = values[0].length - 1;
-    values[lastRow][lastCol] = new CellMarked(values[lastRow][lastCol], 1 /* End */, layout);
-    return values;
-}
 export class MetaItem {
     constructor(item, layoutType) {
         this.item = item;
@@ -65,7 +57,6 @@ export class MetaItem {
         const lastCol = values[0].length - 1;
         values[lastRow][lastCol] = new CellMarked(values[lastRow][lastCol], 1 /* End */, this);
         return values;
-        //return pseudoMarkerHelper(this.item, this);
     }
 }
 //# sourceMappingURL=MetaData.js.map

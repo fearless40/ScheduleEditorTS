@@ -1,6 +1,7 @@
 import { Datum, ReadonlyDataItem } from "../../data/DataItemHelpers.js";
 import { TableRange } from "../../layout/Helpers.js";
 import { ColumnPainter } from "./ColumnPainter.js";
+import { RowPainter } from "./RowPainter.js";
 class ColItem {
     constructor() {
         this.value = "";
@@ -479,6 +480,7 @@ export class ScheduleWidget {
         //let col_meta = layout.metaData_get(MetaTypes.Columns);
         this.mHtmlCells = build_storage(grid.length, grid[0].length);
         this.mHtmlCol = create_columns_descriptors(table, range_left.col_end);
+        this.mHtmlRow = new Array();
         //Generate the header meta element
         if (layout.metaData_exists(0 /* Header */)) {
             const tHead = document.createElement("thead");
@@ -513,6 +515,7 @@ export class ScheduleWidget {
     render_cells(parent, range, grid) {
         for (let rowIndex = range.row_start; rowIndex <= range.row_end; ++rowIndex) {
             let tr = document.createElement("tr");
+            this.mHtmlRow.push(tr);
             const row = grid[rowIndex];
             for (let colIndex = range.col_start; colIndex <= range.col_end; ++colIndex) {
                 const cell = row[colIndex];
@@ -560,6 +563,24 @@ export class ScheduleWidget {
             }
         }
         // Column Painters -- end
+        if (layout.metaData_exists(4 /* Rows */)) {
+            const cRanges = layout.metaData_get(3 /* Columns */);
+            for (var item of cRanges) {
+                item.range.forEach((row, col) => {
+                    const tHtmlCell = this.mHtmlCells[row][col];
+                    const PInfo = {
+                        value: tHtmlCell.element.textContent,
+                        row: row,
+                        col: col,
+                        owner: tHtmlCell.owner,
+                        id: tHtmlCell.id
+                    };
+                    if (item instanceof RowPainter) {
+                        item.paint(this.mHtmlRow[row], PInfo);
+                    }
+                });
+            }
+        }
     }
 }
 //# sourceMappingURL=ScheduleWidget.js.map

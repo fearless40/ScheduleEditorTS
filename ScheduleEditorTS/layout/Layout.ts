@@ -1,5 +1,6 @@
 ﻿import * as DV from "../data/Data.js"
 import { Cell, Cell2d, MaxColumns, CellSimple  } from "./Cell.js"
+import { DataTable } from "../data/Data.js";
 
 
 export interface LayoutItem {
@@ -30,6 +31,24 @@ export class Wrapper implements LayoutItem {
  
     }
     
+}
+
+
+function isDataTable(item: DataTable | LayoutItem): item is DataTable {
+    return (<DataTable>item).getRow !== undefined;
+}
+
+function isLayoutItem(item: DataTable | LayoutItem): item is LayoutItem {
+    return (<LayoutItem>item).toGrid !== undefined;
+}
+
+export function WrapperHelper(item: DataTable | LayoutItem): LayoutItem {
+    if (isLayoutItem(item)) {
+        return item;
+    }
+    else {
+        return new Wrapper(item);
+    }
 }
 
 

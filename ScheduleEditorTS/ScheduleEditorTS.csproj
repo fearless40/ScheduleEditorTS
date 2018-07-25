@@ -105,6 +105,7 @@
     <TypeScriptCompile Include="layout\MetaData.ts" />
     <TypeScriptCompile Include="widgets\FloatingTextInput.ts" />
     <TypeScriptCompile Include="widgets\Schedule\ColumnPainter.ts" />
+    <TypeScriptCompile Include="widgets\Schedule\RowPainter.ts" />
     <TypeScriptCompile Include="widgets\Schedule\ScheduleWidget.ts" />
     <TypeScriptCompile Include="data\Data.ts" />
     <TypeScriptCompile Include="layout\Cell.ts" />

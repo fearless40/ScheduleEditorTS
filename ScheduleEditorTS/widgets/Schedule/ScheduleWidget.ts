@@ -6,6 +6,7 @@ import { TableRange } from "../../layout/Helpers.js";
 import { Cell2d } from "../../layout/Cell.js";
 import { PaintInformation, Painter } from "Painter.js"
 import { ColumnPainter } from "./ColumnPainter.js";
+import { RowPainter } from "./RowPainter.js";
 
 class ColItem {
     constructor() {}
@@ -282,6 +283,7 @@ export class ScheduleWidget {
     private mOwnerToHtml: OwnerToCellMap;
     private mCurrentSelection: Selection;
     private mHtmlCol: HTMLElement[];
+    private mHtmlRow: HTMLElement[];
 
 
     constructor(parent: Node) {
@@ -574,6 +576,7 @@ export class ScheduleWidget {
 
         this.mHtmlCells = build_storage(grid.length, grid[0].length);
         this.mHtmlCol = create_columns_descriptors(table, range_left.col_end);
+        this.mHtmlRow = new Array<HTMLElement>();
 
         //Generate the header meta element
         if (layout.metaData_exists(MetaTypes.Header)) {
@@ -617,6 +620,7 @@ export class ScheduleWidget {
     private render_cells(parent: HTMLElement, range: TableRange, grid: Cell2d): void {
         for (let rowIndex = range.row_start; rowIndex <= range.row_end; ++rowIndex) {
             let tr = document.createElement("tr");
+            this.mHtmlRow.push(tr);
             const row = grid[rowIndex];
 
             for (let colIndex = range.col_start; colIndex <= range.col_end; ++colIndex) {
@@ -670,6 +674,25 @@ export class ScheduleWidget {
             }
         }
         // Column Painters -- end
+
+        if (layout.metaData_exists(MetaTypes.Rows)) {
+            const cRanges = layout.metaData_get(MetaTypes.Columns);
+            for (var item of cRanges) {
+                item.range.forEach((row, col) => {
+                    const tHtmlCell = this.mHtmlCells[row][col];
+                    const PInfo = {
+                        value: tHtmlCell.element.textContent,
+                        row: row,
+                        col: col,
+                        owner: tHtmlCell.owner,
+                        id: tHtmlCell.id
+                    };
+                    if (item instanceof RowPainter) {
+                        item.paint(this.mHtmlRow[row], PInfo);
+                    }
+                })
+            }
+        }
     }
 
     private render_painters_forEach = (row: number, col: number, painter: Painter) => {

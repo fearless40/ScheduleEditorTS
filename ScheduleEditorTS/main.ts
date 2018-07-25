@@ -32,7 +32,7 @@ function main() : void {
 
     let header_layout = new Lt.Horizontal(true, true);
     let meta_header = new Meta.MetaItem(header_layout, Meta.MetaTypes.Header);
-    header_layout.addDataTable(new MonthLabel(5));
+    header_layout.addLayout(new ColumnPainter(new MonthLabel(5), (Element, info) => Element.style.width = "7em"));
 
     let month_days_vert = new Lt.Vertical(true, true);
     month_days_vert.borderBetweenDivisions = false;

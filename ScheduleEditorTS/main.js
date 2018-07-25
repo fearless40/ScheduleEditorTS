@@ -23,7 +23,7 @@ function main() {
     data_layout.borderBetweenDivisions = true;
     let header_layout = new Lt.Horizontal(true, true);
     let meta_header = new Meta.MetaItem(header_layout, 0 /* Header */);
-    header_layout.addDataTable(new MonthLabel(5));
+    header_layout.addLayout(new ColumnPainter(new MonthLabel(5), (Element, info) => Element.style.width = "7em"));
     let month_days_vert = new Lt.Vertical(true, true);
     month_days_vert.borderBetweenDivisions = false;
     header_layout.addLayout(month_days_vert);
