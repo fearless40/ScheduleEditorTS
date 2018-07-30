@@ -91,11 +91,18 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="controllers\TableEditor.ts" />
+    <TypeScriptCompile Include="data\adapters\ScheduleToTable.ts" />
     <TypeScriptCompile Include="data\DataItemHelpers.ts" />
     <TypeScriptCompile Include="data\DataSelectors.ts" />
     <TypeScriptCompile Include="data\EmptyData.ts" />
     <TypeScriptCompile Include="data\MonthDataSink.ts" />
     <TypeScriptCompile Include="data\ScheduleData.ts" />
+    <TypeScriptCompile Include="data\sources\EventGroup.ts" />
+    <TypeScriptCompile Include="data\sources\Schedule.ts" />
+    <TypeScriptCompile Include="data\sources\Factory.ts" />
+    <TypeScriptCompile Include="data\sources\Properties.ts" />
+    <TypeScriptCompile Include="data\sources\ScheduleOwner.ts" />
+    <TypeScriptCompile Include="data\sources\TimeSlot.ts" />
     <TypeScriptCompile Include="layout\Helpers.ts" />
     <TypeScriptCompile Include="main.ts" />
     <TypeScriptCompile Include="util\DateHelper.ts" />
