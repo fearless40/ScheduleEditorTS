@@ -42,5 +42,23 @@ export interface DataTable extends DataView{
    getRow(rowIndex: number): Array<DataItem>
    // getByRowCol(row : number, col : number ) : DataItem
 }
-   
+
+
+export class NullOwner implements DataView {
+    getById(dataID: number): DataItem {
+        return NullDataItem.NullDataItem;
+    }
+
+    public static readonly NullOwner = new NullOwner();
+}
+
+export class NullDataItem implements DataItem {
+    readonly value: string = "";
+    readonly owner = NullOwner.NullOwner;
+    readonly id: number = 0
+
+    public static readonly NullDataItem = new NullDataItem();
+}
+
+
 

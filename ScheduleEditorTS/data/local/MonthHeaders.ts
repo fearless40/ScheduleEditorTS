@@ -1,6 +1,6 @@
-﻿import { DataTable, DataItem } from "./Data.js"
-import { ReadonlyDataItem } from "./DataItemHelpers.js"
-import { MonthHelper } from "../util/DateHelper.js";
+﻿import { DataTable, DataItem } from "../Data.js"
+import { ReadonlyDataItem } from "../DataItemHelpers.js"
+import { MonthHelper } from "../../util/DateHelper.js";
 
 
 export class MonthLabel implements DataTable{
@@ -79,57 +79,4 @@ export class MonthDaysLabels implements DataTable {
 
 }
 
-export class MonthHeader implements DataTable{
-
-    private mRows: Array<Array<String>>;
-    private mDate_Start: Date;
-    private mDate_End: Date;
-
-    constructor(month: number, year: number) {
-        this.mDate_Start = new Date(year, month, 1);
-        this.mDate_End = new Date(year, month + 1, 0);
-    }
-
-
-    maxCountRows(): number {
-         return 2;
-    }
-
-    maxCountCols(): number {
-        return (this.mDate_End.getDate() - this.mDate_Start.getDate()) + 1; 
-    }
-
-    private extractRowFromID(id: number) : number {
-        return id - (this.maxCountCols() * Math.floor(id / this.maxCountCols()));
-    }
-
-    getById(dataID: number): DataItem {
-        return new ReadonlyDataItem(dataID.toString());
-    }
-
-    getRow(rowIndex: number): Array<DataItem> {
-        if (rowIndex > this.maxCountRows()) {
-            return [];
-        }
-
-        let ret = new Array<DataItem>(this.maxCountCols());
-
-        switch (rowIndex) {
-            case 0:
-                for (let i = 0; i < this.maxCountCols(); ++i) {
-                    ret[i] = new ReadonlyDataItem((i+1).toString())
-                }
-                break;
-            case 1:
-                for (let i = 0; i < this.maxCountCols(); ++i) {
-                    let dt = new Date(this.mDate_Start);
-                    dt.setDate(i+1);
-                    ret[i] = new ReadonlyDataItem(dt.toLocaleDateString("en", { weekday: "narrow" }))
-                }
-                break;
-        }
-   
-        return ret;
-    }
-}
 

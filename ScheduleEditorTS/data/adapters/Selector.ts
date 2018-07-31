@@ -1,4 +1,4 @@
-﻿import {DataTable, DataItem} from "./Data"
+﻿import {DataTable, DataItem} from "../Data"
 
 
 export class GetSingleDataItem implements DataTable {

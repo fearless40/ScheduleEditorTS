@@ -5,7 +5,6 @@ export interface ScheduleEvent extends Properties{
     time_start: Date
     duration: number // in minutes
     value: EventDefinition
-    //properties?: Map<string, string>
 }
 
 

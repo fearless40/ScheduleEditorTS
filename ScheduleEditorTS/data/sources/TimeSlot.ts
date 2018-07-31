@@ -1,6 +1,6 @@
-﻿import { DataTable, DataItem } from "../Data";
-import { Datum } from "../DataItemHelpers";
-import { ScheduleEvent } from "./Schedule";
+﻿import { DataTable, DataItem } from "../Data.js";
+import { Datum } from "../ItemHelpers.js";
+import { ScheduleEvent } from "./Schedule.js";
 
 export class TimeSlotEntry implements Properties {
     time_start: Date
@@ -13,7 +13,6 @@ export class TimeSlotEntry implements Properties {
             this.display = display;
         }
     }
-   // properties: Map<string, string>
 
     getProperty(id: string): Property {
         return { id: "yo", value: "no" };

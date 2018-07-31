@@ -1,5 +1,5 @@
 ﻿import { DataView, DataTable, DataItem, DataValue, onChangeResults, DataChangedBy, EventOnChange} from "./Data.js"
-import { Datum } from "./DataItemHelpers.js"
+import { Datum } from "./ItemHelpers.js"
 import {EventSimple} from "../util/EventSimple.js"
 /*
  * ScheduleData event chain
@@ -13,6 +13,12 @@ import {EventSimple} from "../util/EventSimple.js"
  *  5. Widget / Controller gets changed message and updates its view
  *  6. Anything else that is currently depending on the data gets notified also
  *  
+ */
+
+
+/*
+ * Not Used left in for now for example. Will be removed in the future 
+ *
  */
 
 export const enum ScheduleSlotSpecialValues {
