@@ -3,7 +3,7 @@ import { ScheduleOwner } from "./ScheduleOwner";
 
 export interface ScheduleEvent extends Properties{
     time_start: Date
-    duration: number // in minutes
+    time_end: Date // in minutes
     value: EventDefinition
 }
 

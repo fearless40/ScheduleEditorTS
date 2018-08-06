@@ -26,6 +26,7 @@ export interface TimeSlotIndex {
 
 export class TimeSlots implements DataTable {
     readonly id: string
+    name: string
     description: string
     slots: Array<TimeSlotEntry> //are sorted by timestart
 
