@@ -1,6 +1,5 @@
 ﻿import { DataTable, DataItem } from "../Data.js";
 import { Datum } from "../ItemHelpers.js";
-import { ScheduleEvent } from "./Schedule.js";
 
 export class TimeSlotEntry implements Properties {
     time_start: Date
@@ -53,10 +52,10 @@ export class TimeSlots implements DataTable {
         return new Datum(this.slots[dataID].display, dataID, this);
     }
 
-    toIndex(event : ScheduleEvent): TimeSlotIndex {
-        const start = event.time_start;
-        const end = new Date(event.time_start)
-        end.setMinutes(event.time_start.getMinutes() + event.duration);
+    toIndex(time_start : Date, duration : number): TimeSlotIndex {
+        const start = time_start;
+        const end = new Date(time_start)
+        end.setMinutes(start.getMinutes() + duration);
 
         const startindex = this.slots.findIndex((element) => (start >= element.time_start && start < element.time_end));
         const endindex = this.slots.findIndex((element) => (end > element.time_start && end <= element.time_end));

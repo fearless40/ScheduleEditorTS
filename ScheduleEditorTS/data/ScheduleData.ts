@@ -71,7 +71,7 @@ export class ScheduleSlotData implements DataTable{
         this.generateData();
     }
 
-    private makeId(row: number, col: number): number {
+    makeId(row: number, col: number): number {
         return row * this.maxCountCols() + col;
     }
 

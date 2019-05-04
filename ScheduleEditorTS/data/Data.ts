@@ -41,6 +41,7 @@ export interface DataTable extends DataView{
    maxCountCols(): number
    getRow(rowIndex: number): Array<DataItem>
    // getByRowCol(row : number, col : number ) : DataItem
+   makeId(row:number, col:number) : number 
 }
 
 

@@ -17,14 +17,20 @@
  * /delete/timeslots = delete all the timeslots
  * /put/timeslots/{id} = change a timeslot
  * 
+ * 
+ * 
+ * 
  * ScheduleOwner extends User
  * id: unique_value
  * name: string
+ * short_display: string
+ * long_display: string
+ * 
+ * ScheduleUser extends ScheduleOwner
  * email: string
  * first_name: string
  * last_name: string
- * short_display: string
- * long_display: string
+ *
  * 
  * /get/scheduleowners = list of people / resource that have schedule data
  * /CRUD operations
@@ -34,10 +40,10 @@
  * date_start: date
  * date_end: date
  * name: string
- * creation_by: ScheduleOwner
+ * creation_by: ScheduleUser
  * creation_date: date
- * schedule_people: Array<ScheduleOwner>
- * schedule_people_limits: Map<ScheduleOwnerId, AllowedEvents> 
+ * schedule_people: Array<ScheduleUser>
+ * schedule_people_limits: Map<ScheduleOwnerId, EventGroup> 
  * holiday_group: <HolidayGroup>
  * template: <ScheduleTemplate>
  * options: ScheduleOptions
@@ -59,20 +65,19 @@
  * 
  * ScheduleEvents
  * id: unique
- * date_start: date
- * date_end: date
- * value: string
+ * value: number (mapped from EventGroup)
  * properties? : propertybag
- * ScheduleOwner: <scheduleowner>
+ * ScheduleUser: <ScheduleUser>
  * 
- * EventValues
- * id:string
+ * Event
+ * id:<id>
  * description: string
  * formating: <Format>
+ * hidden: boolean
  * 
- * EventValueGroup
- * id: string
+ * EventGroup
+ * id: <id>
  * name: string
- * EventValues: Array<EventValues>
+ * EventValues: Array<Event>
  * 
  */
